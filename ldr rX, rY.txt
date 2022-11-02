@@ -1,0 +1,9 @@
+    ldr rX, rY
+    ldr rX, mXX
+    str rX, rY
+    str rX, mXX
+
+    b label          -> bz r0, label
+    bz rX, label
+    bp rX, label
+    bl rX, label

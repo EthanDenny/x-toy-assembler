@@ -1,0 +1,45 @@
+.data m00, 0xFF00 // Reserves 00
+.data m01, "Hello, World\0"
+
+// r1: 1
+// r2: 0xFF (char pointer)
+// r3: 0xFF (queue tail)
+// r4: 0xFF00
+// r5: 2
+// r6: first character
+// r7: second character
+
+main:
+    mov r1, #1   // r1 = 1
+    mov r2, 0xFF // r2 = 0xFF
+    mov r3, 0xFF // r3 = 0xFF
+    ldr r4, m00  // r4 = 0xFF00
+    mov r5, #2   // r5 = 2
+input:
+    stdin r6     // r6 = input()
+    str r7, r3   // *(r3) = r6
+    bz r6, print // if r6 == 0x00: goto print
+
+    stdin r7     // r7 = input()
+    lsl r7, r5   // r7 = r7 << 2
+    add r7, r6   // r7 += r6 (equivalent to r7 |= r6)
+    str r7, r3   // *(r3) = r7
+    bz r7, print // if r7 == 0x00: goto print
+    
+    sub r3, r1   // r3--
+    b input      // goto input
+print:
+    ldr r6, r2   // r6 = *(r2)
+    mov r7, r6   // r7 = r6
+    
+    lsr r6, r5   // r6 = r6 >> 2
+    bz r6, done  // if r6 == 0x00: goto done
+    stdout r6    // print r6
+
+    xor r7, r4   // r7 = r7 ^ 0xFF00
+    bz r7, done  // if r7 == 0x00: goto done
+    stdout r7    // print r7
+
+    sub r2, r6   // r2++
+    b print      // goto print
+done:

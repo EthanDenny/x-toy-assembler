@@ -1,0 +1,28 @@
+// Declare variables
+key AX, i; set i, 3
+key BX, sum; set sum, 0
+key CX, n
+
+// If 'i' can be divided evenly by 3, add 'i' to 'sum'
+.multiple_subtract_three
+    mov n, i
+    .loop_a
+        set RBX, 3; sub n, RBX; brp n, .loop_a
+    brz n, .increment_sum
+
+// If 'i' can be divided evenly by 5, add 'i' to 'sum'
+.multiple_subtract_five
+    mov n, i
+    .loop_b
+        set RBX, 5; sub n, RBX; brp n, .loop_b
+    brz n, .increment_sum
+    jump .end
+
+.increment_sum
+    add sum, i
+
+.end
+    set RBX, 1; add i, RBX
+    set RAX, 10; sub RAX, i; brp RAX, .multiple_subtract_three
+    write sum
+    end

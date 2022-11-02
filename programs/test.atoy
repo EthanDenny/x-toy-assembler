@@ -1,0 +1,10 @@
+key AX, a; read a
+key BX, sum; set sum, 0
+
+.add
+    add sum, a
+    set RBX, 1; sub a, RBX
+    brp a, .add
+
+write sum
+end
