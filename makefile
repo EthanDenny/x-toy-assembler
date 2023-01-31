@@ -1,13 +1,13 @@
 CC = g++
 CFLAGS = -g #-Wall
 
-default: parser
+default: assembler
 
-parser:	parser.o
-	$(CC) $(CFLAGS) -o parser parser.o
+assembler: assembler.o
+	$(CC) $(CFLAGS) -o assembler assembler.o
 
-parser.o: parser.cpp types.h
-	$(CC) $(CFLAGS) -c parser.cpp
+assembler.o: assembler.cpp types.h
+	$(CC) $(CFLAGS) -c assembler.cpp
 
 clean:
-	rm parser *.o
+	rm assembler *.o
