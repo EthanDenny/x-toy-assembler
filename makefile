@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS  = -g -Wall
+CFLAGS = -g #-Wall
 
 default: parser
 
@@ -9,5 +9,5 @@ parser:	parser.o
 parser.o: parser.cpp types.h
 	$(CC) $(CFLAGS) -c parser.cpp
 
-clean: 
-	del parser.exe *.o *~
+clean:
+	rm parser *.o
