@@ -1,185 +1,207 @@
-# SYNTAX
+# Constraints
 
-## KEY \<reg>, \<name>
+r0 is always 0. PC is a special register that can only be accessed with a 
 
-Create an association between the register 'reg' and the keyword 'name'.
+m00 - m0F is reserved for data and cannot be used for program memory
 
-*Syntax*
+Program memory always starts at m10
 
-    register, keyword
+# Terms
 
-## VAR \<name>, [\<value>]
+'&' denotes a numerical digit of some kind
+'[]' denotes an optional argument
 
-Create a dedicated memory space for the variable associated with the
-keyword 'name'. The memory space initializes with the value 0000h.
+- reg : A register, written as 'r&'
+- mem : A memory location, written as 'm&&'
+- imm : A decimal value, written as '#&'
+- hex : A hexadecimal value, written as '0x&&&&'
+- str : A string of characters surrounded by double quotes. Supports the escape sequences \0 (null character), \n (newline), and \\" (double quote).
+- label : The name of a jump label
+- any : Anything (terminated by whitespace)
+- newline : A newline
 
-If 'value' is defined, initialize the memory space with the value of
-'value' instead.
+# Syntax
 
-*Syntax*
+## ;
+## \<newline>
 
-    keyword, [constant]
+Delineates statement evaluation
 
-# ARITHMETIC and LOGICAL
+# Preprocess
 
-## ADD \<ax>, \<bx>, [\<cx>]
+## .data \<mem>, \<hex>
 
-Increment the contents of register 'ax' by the contents of register 'bx'.
-If cx is defined, store the result in cx.
+Sets the given memory location to the given hex value
 
-*Syntax*
+## .data \<mem>, \<str>
 
-    register, register, [register]
+Creates a C-like string starting at the given memory location. Does not add a null character (\0) at the end of the string by default, this must be done explicitly.
 
-## AND \<ax>, \<bx>, [\<cx>]
+## .define \<macro>, \<statement>
 
-Binary AND the contents of register 'ax' by the contents of register 'bx'.
-If cx is defined, store the result in cx.
+Tell the assembler to replace 'statement' with 'macro' anywhere in the code. Neither 'macro' not 'statement' should contain any commas. Whitespace after the comma will be ignored until a non-whitespace character.
 
-*Syntax*
+### *Syntax*
 
-    register, register, [register]
+    any, any
 
-## BSL \<ax>, \<bx>, [\<cx>]
+## \<label>:
 
-Bit shift the contents of register 'ax' left by the contents of register
-'bx'. If cx is defined, store the result in cx.
+Creates a reference to the statement's line in code for use in jump instructions
 
-*Syntax*
+## //\<any>
 
-    register, register, [register]
+A comment. Ignored by the assembler
 
-## BSR \<ax>, \<bx>, [\<cx>]
+# Arithmetic and Logical
 
-Bit shift the contents of register 'ax' right by the contents of register 'bx'.
-If cx is defined, store the result in cx.
+## add [\<dest>], \<a>, \<b>
 
-*Syntax*
+Add 'b' to 'a'.
 
-    register, register, [register]
+If 'dest' is defined, store the result in 'dest'. Otherwise, store the result in 'a'.
 
+### *Syntax*
 
-## SUB \<ax>, \<bx>, [\<cx>]
+    [reg], reg, reg
 
-Decrement the contents of register 'ax' by the contents of register 'bx'.
-If cx is defined, store the result in cx.
+## sub [\<dest>], \<a>, \<b>
 
-*Syntax*
+Subtract 'b' from 'a'.
 
-    register, register, [register]
+If 'dest' is defined, store the result in 'dest'. Otherwise, store the result in 'a'.
 
-## XOR \<ax>, \<bx>, [\<cx>]
+### *Syntax*
 
-Binary XOR the contents of register 'ax' by the contents of register 'bx'.
-If cx is defined, store the result in cx.
+    [reg], reg, reg
 
-*Syntax*
+## and [\<dest>], \<a>, \<b>
 
-    register, register, [register]
+Binary AND 'a' and 'b'.
 
-# TRANSFER
+If 'dest' is defined, store the result in 'dest'. Otherwise, store the result in 'a'.
 
-## MOV \<dest>, \<src>
+### *Syntax*
 
-Copy the value at 'src' into 'dest'.
+    [reg], reg, reg
 
-*Syntax*
+## xor [\<dest>], \<a>, \<b>
 
-    register, register
-    register, var
-    var, register
+Binary XOR 'a' and 'b'.
 
-## SET \<dest>, \<value>
+If 'dest' is defined, store the result in 'dest'. Otherwise, store the result in 'a'.
 
-Set the register 'dest' to the constant 'value'.
+### *Syntax*
 
-*Syntax*
+    [reg], reg, reg
 
-    register, constant
+## lsl [\<dest>], \<a>, \<b>
 
-# CONTROL
+Bit shift 'a' left by 'b'.
 
-## BP \<condition>, \<goto>
+If 'dest' is defined, store the result in 'dest'. Otherwise, store the result in 'a'.
 
-If the value in the register 'condition' is greater than 0, set the
-program counter to the address associated with the label 'goto'.
+### *Syntax*
 
-*Syntax*
+    [reg], reg, reg
 
-    register, label
+## lsr [\<dest>], \<a>, \<b>
 
-## BZ \<condition>, \<goto>
+Bit shift 'a' right by 'b'.
 
-If the value in the register 'condition' is 0, set the program counter to
-the address associated with the label 'goto'.
+If 'dest' is defined, store the result in 'dest'. Otherwise, store the result in 'a'.
 
-*Syntax*
+### *Syntax*
 
-    register, label
+    [reg], reg, reg
 
-## END
+# Transfer
 
-Halts program execution.
+## mov \<dest>, \<src>
 
-## FUNC \<goto>, [\<reg>]
-
-If 'reg' is defined, set the register 'reg' to the current program counter.
-
-If 'reg' is not defined, set the register REX to the current program
-counter.
-
-After that, set the program counter to the address associated with the
-label 'goto'.
+Copy 'src' into 'dest'.
 
 *Syntax*
 
-    label, [register]
+    reg, reg
 
-## JUMP \<goto>
+## mov \<reg>, \<imm>
+## mov \<reg>, \<hex>
 
-Set the program counter to the address associated with the label 'goto'.
+Set the given register to the given value.
+
+## ldr \<reg>, \<mem>
+
+Copy the given memory into the given register
+
+## str \<mem>, \<reg>
+
+Copy the given register into the given memory
+
+# Control
+
+## bz \<reg>, \<label>
+
+If the value in the given register is 0, goto the given label.
+
+## bp \<reg>, \<label>
+
+If the value in the given register is greater than 0, goto the given label.
+
+## goto \<label>
+
+Goto the given label.
+
+## jump \<reg>
+
+Jump to the address stored in the given register
+
+## link \<reg>, \<addr>
+
+Store the PC in the given register and then jump to 'addr'
 
 *Syntax*
 
-    label
-
-## RETURN [\<reg>]
-
-If 'reg' is defined, set the program counter to the value in the register
-'reg'.
-
-If 'reg' is not defined, set the program counter to the value in the
-register 'REX'.
-
-*Syntax*
-
-    [register]
+    reg, mem
 
 # I/O
 
-## IN \<reg>
+## stdin \<reg>
 
-Set the value of the register 'reg' to stdin
+Set the value of the given register to stdin
 
-## OUT \<reg>
+## stdin \<reg>
 
-Write the value of the register 'reg' to stdout
+Write the value of the given register to stdout
 
-# SPECIAL
+# Machine codes
 
-## HEX \<value>
+## Arithmetic and Logical
 
-Store the value 'value' at the memory address of this instruction
+- add -> 1#ab (# = d or a)
+- sub -> 2#ab (# = d or a)
+- and -> 3#ab (# = d or a)
+- xor -> 4#ab (# = d or a)
+- lsl -> 5#ab (# = d or a)
+- lsr -> 6#ab (# = d or a)
 
-## .\<name>
+## Transfer
 
-Create an association between the label 'name' and the address of the next
-instruction.
+- mov d, s -> 1ds0
+- mov r, i -> 7r## (## = i converted to hex)
+- mov r, h -> 7r## (## = h)
+- ldr -> 8rmm
+- str -> 9rmm
 
-## //\<comment>
+## Control
 
-Add a comment with no effect on execution
+- bz -> Cr## (## = resolved label)
+- bp -> Dr## (## = resolved label)
+- goto -> C0## (## = resolved label)
+- jump -> Er00
+- link -> Fr## (## = addr)
 
-## ;
+## I/O
 
-Delineates statement evaluation, equivalent to a newline
+- stdin -> 8rFF
+- stdout -> 9rFF
