@@ -56,7 +56,7 @@ string TokenTypeDescriptors[] =
 
     "DATA",
     "DEFINE",
-    "COMMENT",
+    "// COMMENT",
 
     "REGISTER",
     "MEMORY",
@@ -85,12 +85,12 @@ string TokenTypeDescriptors[] =
     "STDOUT",
 
     "NEWLINE",
-    "SEMICOLON",
-    "COLON",
-    "COMMA",
-    "CURLY_BRACE_LEFT",
-    "CURLY_BRACE_RIGHT",
-    "WHSPC",
+    ";",
+    ":",
+    ",",
+    "{",
+    "}",
+    "_",
 
     "END",
 

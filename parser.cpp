@@ -275,22 +275,37 @@ vector<Token> parse(string text) {
     return tokens;
 }
 
+void printLineNum(int n) {
+    if (n < 10) {
+        cout << "00";
+    }
+    else if (n < 100) {
+        cout << "0";
+    }
+    cout << n << ": ";
+}
+
 void prettyParse(string text) {
     vector<Token> tokens = parse(text);
 
-    int j = 0;
+    int token_count = (int) tokens.size();
 
-    cout << "0: ";
+    int j = 1;
+    printLineNum(j);
 
-    for (int i = 0; i < (int) tokens.size(); i++) {
-        cout << TokenTypeDescriptors[tokens[i].type] << " ";
-
+    for (int i = 0; i < token_count; i++) {
         if (tokens[i].type == NEWLINE) {
-            j++;
-            cout << "\n" << j << ": ";
+            if (i + 1 < token_count) {
+                j++;
+                cout << endl;
+                printLineNum(j);
+            }
+        }
+        else {
+            cout << TokenTypeDescriptors[tokens[i].type] << " ";
         }
     }
-    cout << "\n";
+    cout << endl;
 }
 
 void fullParse() {
