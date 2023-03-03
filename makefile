@@ -16,4 +16,4 @@ parser.o: parser.cpp types.h
 	$(CC) $(CFLAGS) -c parser.cpp
 
 clean:
-	rm assembler parser *.o
+	-del assembler parser *.o *.exe *.out
