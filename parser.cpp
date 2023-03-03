@@ -292,59 +292,76 @@ void prettyParse(string text) {
     cout << endl;
 }
 
+void prettyParse(string text, bool line_numbers) {
+    if (line_numbers) {
+        prettyParse(text);
+        return;
+    }
+
+    vector<Token> tokens = parse(text);
+
+    int token_count = (int) tokens.size();
+
+    for (int i = 0; i < token_count; i++) {
+        cout << TokenTypeDescriptors[tokens[i].type] << " ";
+    }
+    cout << endl;
+}
+
 void fullParse() {
-    prettyParse("this_could_be_anything");
+    prettyParse("this_could_be_anything", false);
+    prettyParse(" \t   \t    \t\t ", false);
 
     cout << endl;
 
-    prettyParse(".data");
-    prettyParse(".define");
-    prettyParse("// Hello, world");
+    prettyParse(".data", false);
+    prettyParse(".define", false);
+    prettyParse("// Hello, world", false);
 
     cout << endl;
 
-    prettyParse("rF");
-    prettyParse("m0F");
-    prettyParse("#1");
-    prettyParse("0x00FF");
-    prettyParse("\"Hello, world\"");
+    prettyParse("rF", false);
+    prettyParse("m0F", false);
+    prettyParse("#1", false);
+    prettyParse("0x00FF", false);
+    prettyParse("\"Hello, world\"", false);
 
      cout << endl;
 
-    prettyParse("add");
-    prettyParse("sub");
-    prettyParse("and");
-    prettyParse("xor");
-    prettyParse("lsl");
-    prettyParse("lsr");
+    prettyParse("add", false);
+    prettyParse("sub", false);
+    prettyParse("and", false);
+    prettyParse("xor", false);
+    prettyParse("lsl", false);
+    prettyParse("lsr", false);
 
     cout << endl;
 
-    prettyParse("mov");
-    prettyParse("ldr");
-    prettyParse("str");
+    prettyParse("mov", false);
+    prettyParse("ldr", false);
+    prettyParse("str", false);
 
     cout << endl;
 
-    prettyParse("b");
-    prettyParse("bz");
-    prettyParse("bp");
-    prettyParse("br");
-    prettyParse("bl");
+    prettyParse("b", false);
+    prettyParse("bz", false);
+    prettyParse("bp", false);
+    prettyParse("br", false);
+    prettyParse("bl", false);
 
     cout << endl;
 
-    prettyParse("stdin");
-    prettyParse("stdout");
+    prettyParse("stdin", false);
+    prettyParse("stdout", false);
 
     cout << endl;
 
-    prettyParse("\n");
-    prettyParse(";");
-    prettyParse(":");
-    prettyParse(",");
-    prettyParse("{");
-    prettyParse("}");
+    prettyParse("\n", false);
+    prettyParse(";", false);
+    prettyParse(":", false);
+    prettyParse(",", false);
+    prettyParse("{", false);
+    prettyParse("}", false);
 }
 
 string readFile(string filename) {
