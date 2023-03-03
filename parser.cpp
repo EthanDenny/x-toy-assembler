@@ -21,8 +21,8 @@ char getChar(string* text, int i) {
 char consume(string* text) {
     char ch = getChar(text, 0);
     
-    if ((*text).length() > 1) {
-        *text = (*text).substr(1, (*text).length());
+    if (text->length() > 1) {
+        *text = text->substr(1, text->length());
     }
     else {
         *text = "";
@@ -32,8 +32,8 @@ char consume(string* text) {
 }
 
 bool tryConsume(string* text, string sub) {
-    if ((*text).rfind(sub, 0) == 0) {
-        *text = (*text).substr(sub.length(), (*text).length() - sub.length());
+    if (text->rfind(sub, 0) == 0) {
+        *text = text->substr(sub.length(), text->length() - sub.length());
         return true;
     }
     else {
