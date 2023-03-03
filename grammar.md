@@ -37,6 +37,10 @@ Sets the given memory location to the given hex value
 
 Creates a C-like string starting at the given memory location. Does not add a null character (\0) at the end of the string by default, this must be done explicitly.
 
+## .data \<mem>, {\<hex>[, \<hex>, ..]}
+
+Similar to creating a string, but writes each provided hex value consequtively.
+
 ## .define \<macro>, \<statement>
 
 Tell the assembler to replace 'statement' with 'macro' anywhere in the code. Neither 'macro' not 'statement' should contain any commas. Whitespace after the comma will be ignored until a non-whitespace character.
@@ -140,6 +144,10 @@ Copy the given register into the given memory
 
 # Control
 
+## b \<label>
+
+Goto the given label.
+
 ## bz \<reg>, \<label>
 
 If the value in the given register is 0, goto the given label.
@@ -148,15 +156,11 @@ If the value in the given register is 0, goto the given label.
 
 If the value in the given register is greater than 0, goto the given label.
 
-## goto \<label>
-
-Goto the given label.
-
-## jump \<reg>
+## br \<reg>
 
 Jump to the address stored in the given register
 
-## link \<reg>, \<addr>
+## bl \<reg>, \<addr>
 
 Store the PC in the given register and then jump to 'addr'
 
@@ -195,11 +199,11 @@ Write the value of the given register to stdout
 
 ## Control
 
+- b -> C0## (## = resolved label)
 - bz -> Cr## (## = resolved label)
 - bp -> Dr## (## = resolved label)
-- goto -> C0## (## = resolved label)
-- jump -> Er00
-- link -> Fr## (## = addr)
+- br -> Er00
+- bl -> Fr## (## = addr)
 
 ## I/O
 
