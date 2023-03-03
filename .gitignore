@@ -36,3 +36,7 @@
 
 # Batch
 *.bat
+
+# Compiled files on Linux
+assembler
+parser
