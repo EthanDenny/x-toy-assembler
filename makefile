@@ -4,13 +4,13 @@ CFLAGS = -g -Wall
 default: parser
 
 assembler: assembler.o
-	$(CC) $(CFLAGS) assembler.o -o assembler.out
+	$(CC) $(CFLAGS) assembler.o -o assembler
 
 assembler.o: assembler.cpp types.h
 	$(CC) $(CFLAGS) -c assembler.cpp
 
 parser: parser.o
-	$(CC) $(CFLAGS) parser.o -o parser.out
+	$(CC) $(CFLAGS) parser.o -o parser
 
 parser.o: parser.cpp types.h
 	$(CC) $(CFLAGS) -c parser.cpp
