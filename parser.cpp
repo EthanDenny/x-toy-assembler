@@ -269,7 +269,7 @@ void printLineNum(int n) {
     cout << n << ": ";
 }
 
-void prettyParse(string text) {
+void prettyParse(string text, bool use_full) {
     vector<Token> tokens = parse(text);
 
     int token_count = (int) tokens.size();
@@ -285,83 +285,104 @@ void prettyParse(string text) {
                 printLineNum(j);
             }
         }
-        else {
+        else if (!use_full) {
             cout << TokenTypeDescriptors[tokens[i].type] << " ";
+        }
+        else {
+            cout << TokenTypeDescriptorsFull[tokens[i].type] << " ";
         }
     }
     cout << endl;
 }
 
-void prettyParse(string text, bool line_numbers) {
-    if (line_numbers) {
-        prettyParse(text);
+void prettyParse(string text, int mode, bool use_full) {
+    if (mode == 0) {
+        prettyParse(text, use_full);
         return;
     }
+    if (mode >= 1) {
+        vector<Token> tokens = parse(text);
 
-    vector<Token> tokens = parse(text);
+        int token_count = (int) tokens.size();
 
-    int token_count = (int) tokens.size();
+        int j = 1;
 
-    for (int i = 0; i < token_count; i++) {
-        cout << TokenTypeDescriptors[tokens[i].type] << " ";
+        for (int i = 0; i < token_count; i++) {
+            if (tokens[i].type == NEWLINE && mode == 1) {
+                if (i + 1 < token_count) {
+                    j++;
+                    cout << endl;
+                }
+            }
+            else if (!use_full) {
+                cout << TokenTypeDescriptors[tokens[i].type] << " ";
+            }
+            else {
+                cout << TokenTypeDescriptorsFull[tokens[i].type] << " ";
+            }
+        }
+        cout << endl;
     }
-    cout << endl;
 }
 
-void fullParse() {
-    prettyParse("this_could_be_anything", false);
-    prettyParse(" \t   \t    \t\t ", false);
+void prettyParse(string text, int mode) {
+    prettyParse(text, mode, false);
+}
+
+void testFullParse() {
+    prettyParse("this_could_be_anything", 2);
+    prettyParse(" \t   \t    \t\t ", 2);
 
     cout << endl;
 
-    prettyParse(".data", false);
-    prettyParse(".define", false);
-    prettyParse("// Hello, world", false);
+    prettyParse(".data", 2);
+    prettyParse(".define", 2);
+    prettyParse("// Hello, world", 2);
 
     cout << endl;
 
-    prettyParse("rF", false);
-    prettyParse("m0F", false);
-    prettyParse("#1", false);
-    prettyParse("0x00FF", false);
-    prettyParse("\"Hello, world\"", false);
-
-     cout << endl;
-
-    prettyParse("add", false);
-    prettyParse("sub", false);
-    prettyParse("and", false);
-    prettyParse("xor", false);
-    prettyParse("lsl", false);
-    prettyParse("lsr", false);
+    prettyParse("rF", 2);
+    prettyParse("m0F", 2);
+    prettyParse("#1", 2);
+    prettyParse("0x00FF", 2);
+    prettyParse("\"Hello, world\"", 2);
 
     cout << endl;
 
-    prettyParse("mov", false);
-    prettyParse("ldr", false);
-    prettyParse("str", false);
+    prettyParse("add", 2);
+    prettyParse("sub", 2);
+    prettyParse("and", 2);
+    prettyParse("xor", 2);
+    prettyParse("lsl", 2);
+    prettyParse("lsr", 2);
 
     cout << endl;
 
-    prettyParse("b", false);
-    prettyParse("bz", false);
-    prettyParse("bp", false);
-    prettyParse("br", false);
-    prettyParse("bl", false);
+    prettyParse("mov", 2);
+    prettyParse("ldr", 2);
+    prettyParse("str", 2);
 
     cout << endl;
 
-    prettyParse("stdin", false);
-    prettyParse("stdout", false);
+    prettyParse("b", 2);
+    prettyParse("bz", 2);
+    prettyParse("bp", 2);
+    prettyParse("br", 2);
+    prettyParse("bl", 2);
 
     cout << endl;
 
-    prettyParse("\n", false);
-    prettyParse(";", false);
-    prettyParse(":", false);
-    prettyParse(",", false);
-    prettyParse("{", false);
-    prettyParse("}", false);
+    prettyParse("stdin", 2);
+    prettyParse("stdout", 2);
+
+    cout << endl;
+
+    prettyParse("\n", 2);
+    prettyParse(";", 2);
+    prettyParse(":", 2);
+    prettyParse(",", 2);
+    prettyParse("{", 2);
+    prettyParse("}", 2);
 }
 
 string readFile(string filename) {
@@ -380,10 +401,15 @@ string readFile(string filename) {
 }
 
 int main(int argc, char** argv) {
+    if (argc < 4) {
+        cout << "Not enough args";
+        return 0;
+    }
+
     string filename = argv[1];
     string assembly_code = readFile(filename);
 
-    prettyParse(assembly_code);
+    prettyParse(assembly_code, atoi(argv[2]), atoi(argv[3])==1);
 
     return 0;
 }

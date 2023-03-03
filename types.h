@@ -97,6 +97,53 @@ string TokenTypeDescriptors[] =
     "UNKNOWN"
 };
 
+string TokenTypeDescriptorsFull[] =
+{
+    "ANY",
+
+    "DATA",
+    "DEFINE",
+    "COMMENT",
+
+    "REGISTER",
+    "MEMORY",
+    "IMMEDIATE",
+    "HEX",
+    "STRING",
+
+    "ADD",
+    "SUB",
+    "AND",
+    "XOR",
+    "LSL",
+    "LSR",
+
+    "MOV",
+    "LDR",
+    "STR",
+
+    "BRANCH",
+    "BRANCH_ZERO",
+    "BRANCH_POSITIVE",
+    "BRANCH_REGISTER",
+    "BRANCH_LINK",
+
+    "STDIN",
+    "STDOUT",
+
+    "NEWLINE",
+    "SEMICOLON",
+    "COLON",
+    "COMMA",
+    "CURLY_BRACE_LEFT",
+    "CURLY_BRACE_RIGHT",
+    "WHITESPACE",
+
+    "END",
+
+    "UNKNOWN"
+};
+
 typedef struct token {
     token_type type = UNKNOWN;
     string value;
