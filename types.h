@@ -44,7 +44,6 @@ enum token_type {
     CURLY_BRACE_LEFT,
     CURLY_BRACE_RIGHT,
     WHITESPACE,
-    NONE,
 
     END,
 
@@ -92,7 +91,6 @@ string TokenTypeDescriptors[] =
     "CURLY_BRACE_LEFT",
     "CURLY_BRACE_RIGHT",
     "WHSPC",
-    "NONE",
 
     "END",
 
@@ -100,8 +98,8 @@ string TokenTypeDescriptors[] =
 };
 
 typedef struct token {
-    token_type type = NONE;
-    string value = "";
+    token_type type;
+    string value;
 } Token;
 
 typedef struct statement {
