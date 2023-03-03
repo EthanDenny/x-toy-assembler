@@ -10,8 +10,8 @@ bool isAlpha(char c) {
 }
 
 char getChar(string* text, int i) {
-    if ((*text).length() > 0) {
-        return (*text)[0];
+    if ((int) text->length() > i) {
+        return (*text)[i];
     }
     else {
         return EOF;
@@ -144,9 +144,9 @@ Token grabToken(string* text) {
                 if (peek(text) == '/') {
                     t.type = COMMENT;
                     char C = '/';
-                    do {
+                    while (peek(text) != '\n' && C != EOF) {
                         C = consume(text);
-                    } while (C != '\n' && C != EOF);
+                    }
                     break;
                 }
                 if (peek(text) == '*') {
@@ -201,17 +201,19 @@ Token grabToken(string* text) {
                 }
             }
             case '#': {
-                t.type = IMMEDIATE;
                 if (!isdigit(peek(text))) {
                     // Throw an exception here: Expected a digit
                 }
-                do {
-                    t.value += consume(text);
-                } while (isdigit(peek(text)));
-                break;
+                else {
+                    t.type = IMMEDIATE;
+                    do {
+                        t.value += consume(text);
+                    } while (isdigit(peek(text)));
+                    break;
+                }
             }
             case 'r': {
-                if (isxdigit(peek(text))) {
+                if (c == 'r' && isxdigit(peek(text))) {
                     t.type = REGISTER;
                     t.value = consume(text);
                     break;
