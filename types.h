@@ -98,7 +98,7 @@ string TokenTypeDescriptors[] =
 };
 
 typedef struct token {
-    token_type type;
+    token_type type = UNKNOWN;
     string value;
 } Token;
 

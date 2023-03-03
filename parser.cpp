@@ -55,6 +55,10 @@ Token grabToken(string* text) {
     if (text->length() == 0) {
         t.type = END;
     }
+    else if (tryConsume(text, " ") || tryConsume(text, "\t")) {
+        t.type = WHITESPACE;
+        while (tryConsume(text, " ") || tryConsume(text, "\t")) {}
+    }
     else if (tryConsume(text, ":")) {
         t.type = COLON;
     }
@@ -129,130 +133,108 @@ Token grabToken(string* text) {
     }
     else {
         char c = consume(text);
-        switch (c) {
-            case ' ': {
-                t.type = WHITESPACE;
-                while (tryConsume(text, " ") || tryConsume(text, "\t")) {}
-                break;
-            }
-            case '\t': {
-                t.type = WHITESPACE;
-                while (tryConsume(text, " ") || tryConsume(text, "\t")) {}
-                break;
-            }
-            case '/': {
-                if (peek(text) == '/') {
-                    t.type = COMMENT;
-                    char C = '/';
-                    while (peek(text) != '\n' && C != EOF) {
-                        C = consume(text);
-                    }
-                    break;
-                }
-                if (peek(text) == '*') {
-                    t.type = COMMENT;
-                    char C = '/';
-                    do {
-                        C = consume(text);
-                        if (C == '*' && tryConsume(text, "/")) {
-                            break;
-                        }
-                    } while (C != EOF);
-                    break;
-                }
-                break;
-                // Throw an exception here, expected a comment
-            }
-            case '"': {
-                t.type = STRING;
-                bool special = false;
-                char C = consume(text);
-                do {
-                    if (!special) {
-                        t.value += C;
-                    }
-                    else {
-                        switch (C) {
-                        case '0': t.value += '\0';
-                        }
-                    }
+
+        if (c == '/') {
+            if (peek(text) == '/') {
+                t.type = COMMENT;
+                char C = '/';
+                while (peek(text) != '\n' && C != EOF) {
                     C = consume(text);
-                    special = C == '\\';
-                    if (special) {
-                        C = consume(text);
-                    }
-                } while (C != '"' and C != EOF);
-
-                if (C == EOF) {
-                    // Throw an exception here, expected closing quotes
-
-                    t.type = ANY;
                 }
-
-                break;
-                // Throw an exception here, expected a comment
             }
-            case 'm': {
-                if (isxdigit(peek(text)) && isxdigit(peekNext(text))) {
-                    t.type = MEMORY;
+            if (peek(text) == '*') {
+                t.type = COMMENT;
+                char C = '/';
+                do {
+                    C = consume(text);
+                    if (C == '*' && tryConsume(text, "/")) {
+                        break;
+                    }
+                } while (C != EOF);
+            }
+            // Throw an exception here, expected a comment
+        }
+        else if (c == '"') {
+            t.type = STRING;
+            bool special = false;
+            char C = consume(text);
+            do {
+                if (!special) {
+                    t.value += C;
+                }
+                else if (C == '0') {
+                    t.value += '\0';
+                }
+                C = consume(text);
+                special = C == '\\';
+                if (special) {
+                    C = consume(text);
+                }
+            } while (C != '"' and C != EOF);
+
+            if (C == EOF) {
+                // Throw an exception here, expected closing quotes
+
+                t.type = ANY;
+            }
+
+            // Throw an exception here, expected a comment
+        }
+        else if (c == 'm') {
+            if (isxdigit(peek(text)) && isxdigit(peekNext(text))) {
+                t.type = MEMORY;
+                t.value += consume(text);
+                t.value += consume(text);
+            }
+        }
+        else if (c == '#') {
+            if (!isdigit(peek(text))) {
+                // Throw an exception here: Expected a digit
+            }
+            else {
+                t.type = IMMEDIATE;
+                do {
                     t.value += consume(text);
+                } while (isdigit(peek(text)));
+            };
+        }
+        else if (c == 'r') {
+            if (isxdigit(peek(text))) {
+                t.type = REGISTER;
+                t.value = consume(text);
+            }
+        }
+        else if (c == '0') {
+            if (tryConsume(text, "x")) {
+                t.type = HEX;
+
+                int i = 0;
+                char C = consume(text);
+                if (!isxdigit(C)) {
+                    // Throw an exception here: Expected a hex digit
+                }
+
+                while (i < 4 && isxdigit(C)) {
+                    t.value += C;
+                    C = consume(text);
+                    i++;
+                }
+
+                for (int j = 0; j < 4 - i; j++) {
+                    t.value = '0' + t.value;
+                }
+            }
+        }
+        else {
+            if (isAlpha(c)) {
+                t.type = ANY;
+                t.value = c;
+                while (isAlpha(peek(text))) {
                     t.value += consume(text);
-                    break;
                 }
             }
-            case '#': {
-                if (!isdigit(peek(text))) {
-                    // Throw an exception here: Expected a digit
-                }
-                else {
-                    t.type = IMMEDIATE;
-                    do {
-                        t.value += consume(text);
-                    } while (isdigit(peek(text)));
-                    break;
-                }
-            }
-            case 'r': {
-                if (c == 'r' && isxdigit(peek(text))) {
-                    t.type = REGISTER;
-                    t.value = consume(text);
-                    break;
-                }
-            }
-            case '0': {
-                if (tryConsume(text, "x")) {
-                    t.type = HEX;
 
-                    int i = 0;
-                    char C = consume(text);
-                    if (!isxdigit(C)) {
-                        // Throw an exception here: Expected a hex digit
-                    }
-
-                    while (i < 4 && isxdigit(C)) {
-                        t.value += C;
-                        C = consume(text);
-                        i++;
-                    }
-
-                    for (int j = 0; j < 4 - i; j++) {
-                        t.value = '0' + t.value;
-                    }
-
-                    break;
-                }
-            }
-            default: {
-                if (isAlpha(c)) {
-                    t.type = ANY;
-                    t.value = c;
-                    while (isAlpha(peek(text))) {
-                        t.value += consume(text);
-                    }
-                }
-
-                // Throw an exception here: Unknown token
-            }
+            // Throw an exception here: Unknown token
         }
     }
 
