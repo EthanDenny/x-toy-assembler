@@ -5,11 +5,13 @@
 using namespace std;
 
 enum token_type {
+    ANY,
+
     DATA,
+    DEFINE,
     COMMENT,
 
     REGISTER,
-    LABEL,
     MEMORY,
     IMMEDIATE,
     HEX,
@@ -23,13 +25,13 @@ enum token_type {
     LSR,
 
     MOV,
-
     LDR,
     STR,
 
     BRANCH,
     BRANCH_ZERO,
     BRANCH_POSITIVE,
+    BRANCH_REGISTER,
     BRANCH_LINK,
 
     STDIN,
@@ -42,15 +44,67 @@ enum token_type {
     CURLY_BRACE_LEFT,
     CURLY_BRACE_RIGHT,
     WHITESPACE,
-    NONE
+    NONE,
+
+    END,
+
+    UNKNOWN
 };
 
-typedef struct {
+string TokenTypeDescriptors[] =
+{
+    "ANY",
+
+    "DATA",
+    "DEFINE",
+    "COMMENT",
+
+    "REGISTER",
+    "MEMORY",
+    "IMMEDIATE",
+    "HEX",
+    "STRING",
+
+    "ADD",
+    "SUB",
+    "AND",
+    "XOR",
+    "LSL",
+    "LSR",
+
+    "MOV",
+    "LDR",
+    "STR",
+
+    "BRANCH",
+    "BRANCH_ZERO",
+    "BRANCH_POSITIVE",
+    "BRANCH_REGISTER",
+    "BRANCH_LINK",
+
+    "STDIN",
+    "STDOUT",
+
+    "NEWLINE",
+    "SEMICOLON",
+    "COLON",
+    "COMMA",
+    "CURLY_BRACE_LEFT",
+    "CURLY_BRACE_RIGHT",
+    "WHSPC",
+    "NONE",
+
+    "END",
+
+    "UNKNOWN"
+};
+
+typedef struct token {
     token_type type = NONE;
     string value = "";
 } Token;
 
-typedef struct {
+typedef struct statement {
     token_type type;
     Token operands[3];
 } Statement;
