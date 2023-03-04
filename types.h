@@ -5,11 +5,10 @@
 using namespace std;
 
 enum token_type {
-    ANY,
-
     DATA,
     DEFINE,
     COMMENT,
+    LABEL,
 
     REGISTER,
     MEMORY,
@@ -39,7 +38,6 @@ enum token_type {
 
     NEWLINE,
     SEMICOLON,
-    COLON,
     COMMA,
     CURLY_BRACE_LEFT,
     CURLY_BRACE_RIGHT,
@@ -52,11 +50,10 @@ enum token_type {
 
 string TokenTypeDescriptors[] =
 {
-    "ANY",
-
     "DATA",
     "DEFINE",
     "// COMMENT",
+    "LABEL",
 
     "REGISTER",
     "MEMORY",
@@ -86,7 +83,6 @@ string TokenTypeDescriptors[] =
 
     "NEWLINE",
     ";",
-    ":",
     ",",
     "{",
     "}",
@@ -99,11 +95,10 @@ string TokenTypeDescriptors[] =
 
 string TokenTypeDescriptorsFull[] =
 {
-    "ANY",
-
     "DATA",
     "DEFINE",
     "COMMENT",
+    "LABEL",
 
     "REGISTER",
     "MEMORY",
@@ -133,7 +128,6 @@ string TokenTypeDescriptorsFull[] =
 
     "NEWLINE",
     "SEMICOLON",
-    "COLON",
     "COMMA",
     "CURLY_BRACE_LEFT",
     "CURLY_BRACE_RIGHT",

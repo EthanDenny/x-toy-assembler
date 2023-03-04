@@ -59,9 +59,6 @@ Token grabToken(string* text) {
         t.type = WHITESPACE;
         while (tryConsume(text, " ") || tryConsume(text, "\t")) {}
     }
-    else if (tryConsume(text, ":")) {
-        t.type = COLON;
-    }
     else if (tryConsume(text, ";")) {
         t.type = SEMICOLON;
     }
@@ -152,39 +149,34 @@ Token grabToken(string* text) {
                     }
                 } while (C != EOF);
             }
-            // Throw an exception here, expected a comment
+            // Throw an exception here: Expected a comment
         }
         else if (c == '"') {
             t.type = STRING;
-            bool special = false;
-            char C = consume(text);
-            do {
-                if (!special) {
+
+            char C;
+            bool escape = false;
+
+            while (C != '"') {
+                C = consume(text);
+
+                if (C == '\n' || C == EOF) {
+                    // Throw an exception here: Expected closing quotes
+                }
+
+                if (escape) {
+                    if (C == '0') {
+                        t.value += '\0';
+                    }
+                    else if (C == 'n') {
+                        t.value += '\n';
+                    }
+                }
+                else {
                     t.value += C;
                 }
-                else if (C == '0') {
-                    t.value += '\0';
-                }
-                C = consume(text);
-                special = C == '\\';
-                if (special) {
-                    C = consume(text);
-                }
-            } while (C != '"' and C != EOF);
 
-            if (C == EOF) {
-                // Throw an exception here, expected closing quotes
-
-                t.type = ANY;
-            }
-
-            // Throw an exception here, expected a comment
-        }
-        else if (c == 'm') {
-            if (isxdigit(peek(text)) && isxdigit(peekNext(text))) {
-                t.type = MEMORY;
-                t.value += consume(text);
-                t.value += consume(text);
+                escape = C == '\\';
             }
         }
         else if (c == '#') {
@@ -193,47 +185,60 @@ Token grabToken(string* text) {
             }
             else {
                 t.type = IMMEDIATE;
-                do {
+                while (isdigit(peek(text))) {
                     t.value += consume(text);
-                } while (isdigit(peek(text)));
+                };
             };
         }
-        else if (c == 'r') {
-            if (isxdigit(peek(text))) {
-                t.type = REGISTER;
-                t.value = consume(text);
+        else if (c == '0' && tryConsume(text, "x")) {
+            t.type = HEX;
+
+            int i;
+            for (i = 0; i < 4; i++) {
+                if (isxdigit(peek(text))) {
+                    t.value += consume(text);
+                }
+                else {
+                    // Throw an exception here: Expected a hex digit
+                    break;
+                }
+            }
+
+            for (int j = 0; j < 4 - i; j++) {
+                t.value = '0' + t.value;
             }
         }
-        else if (c == '0') {
-            if (tryConsume(text, "x")) {
-                t.type = HEX;
+        else if (c == '_' || isalpha(c)) {
+            if (c == 'm') {
+                if (isxdigit(peek(text))) {
+                    t.value += consume(text);
+                    if (isxdigit(peek(text))) {
+                        t.value += consume(text);
+                        t.type = MEMORY;
+                    }
+                }
+            }
+            else if (c == 'r') {
+                if (isxdigit(peek(text))) {
+                    t.value += consume(text);
+                    t.type = REGISTER;
+                }
+            }
 
-                int i = 0;
-                char C = consume(text);
-                if (!isxdigit(C)) {
-                    // Throw an exception here: Expected a hex digit
+            if (t.type == UNKNOWN) {
+                while (isAlpha(peek(text))) {
+                    t.value += consume(text);
                 }
 
-                while (i < 4 && isxdigit(C)) {
-                    t.value += C;
-                    C = consume(text);
-                    i++;
+                if (tryConsume(text, ":")) {
+                    t.type = LABEL;
                 }
-
-                for (int j = 0; j < 4 - i; j++) {
-                    t.value = '0' + t.value;
+                else {
+                    // Throw an exception here: Unknown token
                 }
             }
         }
         else {
-            if (isAlpha(c)) {
-                t.type = ANY;
-                t.value = c;
-                while (isAlpha(peek(text))) {
-                    t.value += consume(text);
-                }
-            }
-
             // Throw an exception here: Unknown token
         }
     }
@@ -329,60 +334,56 @@ void prettyParse(string text, int mode) {
     prettyParse(text, mode, false);
 }
 
-void testFullParse() {
-    prettyParse("this_could_be_anything", 2);
-    prettyParse(" \t   \t    \t\t ", 2);
+void testFullParse(bool use_full) {
+    prettyParse(".data", 2, use_full);
+    prettyParse(".define", 2, use_full);
+    prettyParse("// Hello, world", 2, use_full);
+    prettyParse("label_this_could_be_anything:", 2, use_full);
 
     cout << endl;
 
-    prettyParse(".data", 2);
-    prettyParse(".define", 2);
-    prettyParse("// Hello, world", 2);
+    prettyParse("rF", 2, use_full);
+    prettyParse("m0F", 2, use_full);
+    prettyParse("#1", 2, use_full);
+    prettyParse("0x00FF", 2, use_full);
+    prettyParse("\"Hello, world\"", 2, use_full);
 
     cout << endl;
 
-    prettyParse("rF", 2);
-    prettyParse("m0F", 2);
-    prettyParse("#1", 2);
-    prettyParse("0x00FF", 2);
-    prettyParse("\"Hello, world\"", 2);
+    prettyParse("add", 2, use_full);
+    prettyParse("sub", 2, use_full);
+    prettyParse("and", 2, use_full);
+    prettyParse("xor", 2, use_full);
+    prettyParse("lsl", 2, use_full);
+    prettyParse("lsr", 2, use_full);
 
     cout << endl;
 
-    prettyParse("add", 2);
-    prettyParse("sub", 2);
-    prettyParse("and", 2);
-    prettyParse("xor", 2);
-    prettyParse("lsl", 2);
-    prettyParse("lsr", 2);
+    prettyParse("mov", 2, use_full);
+    prettyParse("ldr", 2, use_full);
+    prettyParse("str", 2, use_full);
 
     cout << endl;
 
-    prettyParse("mov", 2);
-    prettyParse("ldr", 2);
-    prettyParse("str", 2);
+    prettyParse("b", 2, use_full);
+    prettyParse("bz", 2, use_full);
+    prettyParse("bp", 2, use_full);
+    prettyParse("br", 2, use_full);
+    prettyParse("bl", 2, use_full);
 
     cout << endl;
 
-    prettyParse("b", 2);
-    prettyParse("bz", 2);
-    prettyParse("bp", 2);
-    prettyParse("br", 2);
-    prettyParse("bl", 2);
+    prettyParse("stdin", 2, use_full);
+    prettyParse("stdout", 2, use_full);
 
     cout << endl;
 
-    prettyParse("stdin", 2);
-    prettyParse("stdout", 2);
-
-    cout << endl;
-
-    prettyParse("\n", 2);
-    prettyParse(";", 2);
-    prettyParse(":", 2);
-    prettyParse(",", 2);
-    prettyParse("{", 2);
-    prettyParse("}", 2);
+    prettyParse("\n", 2, use_full);
+    prettyParse(";", 2, use_full);
+    prettyParse(",", 2, use_full);
+    prettyParse("{", 2, use_full);
+    prettyParse("}", 2, use_full);
+    prettyParse(" \t   \t    \t\t ", 2, use_full);
 }
 
 string readFile(string filename) {
