@@ -246,7 +246,7 @@ Token grabToken(string* text) {
     return t;
 }
 
-vector<Token> parse(string text) {
+vector<Token> lex(string text) {
     vector<Token> tokens;
 
     while (true) {
@@ -274,8 +274,8 @@ void printLineNum(int n) {
     cout << n << ": ";
 }
 
-void prettyParse(string text, bool use_full) {
-    vector<Token> tokens = parse(text);
+void prettyLex(string text, bool use_full) {
+    vector<Token> tokens = lex(text);
 
     int token_count = (int) tokens.size();
 
@@ -300,13 +300,13 @@ void prettyParse(string text, bool use_full) {
     cout << endl;
 }
 
-void prettyParse(string text, int mode, bool use_full) {
+void prettyLex(string text, int mode, bool use_full) {
     if (mode == 0) {
-        prettyParse(text, use_full);
+        prettyLex(text, use_full);
         return;
     }
     if (mode >= 1) {
-        vector<Token> tokens = parse(text);
+        vector<Token> tokens = lex(text);
 
         int token_count = (int) tokens.size();
 
@@ -330,60 +330,60 @@ void prettyParse(string text, int mode, bool use_full) {
     }
 }
 
-void prettyParse(string text, int mode) {
-    prettyParse(text, mode, false);
+void prettyLex(string text, int mode) {
+    prettyLex(text, mode, false);
 }
 
-void testFullParse(bool use_full) {
-    prettyParse(".data", 2, use_full);
-    prettyParse(".define", 2, use_full);
-    prettyParse("// Hello, world", 2, use_full);
-    prettyParse("label_this_could_be_anything:", 2, use_full);
+void testFullLex(bool use_full) {
+    prettyLex(".data", 2, use_full);
+    prettyLex(".define", 2, use_full);
+    prettyLex("// Hello, world", 2, use_full);
+    prettyLex("label_this_could_be_anything:", 2, use_full);
 
     cout << endl;
 
-    prettyParse("rF", 2, use_full);
-    prettyParse("m0F", 2, use_full);
-    prettyParse("#1", 2, use_full);
-    prettyParse("0x00FF", 2, use_full);
-    prettyParse("\"Hello, world\"", 2, use_full);
+    prettyLex("rF", 2, use_full);
+    prettyLex("m0F", 2, use_full);
+    prettyLex("#1", 2, use_full);
+    prettyLex("0x00FF", 2, use_full);
+    prettyLex("\"Hello, world\"", 2, use_full);
 
     cout << endl;
 
-    prettyParse("add", 2, use_full);
-    prettyParse("sub", 2, use_full);
-    prettyParse("and", 2, use_full);
-    prettyParse("xor", 2, use_full);
-    prettyParse("lsl", 2, use_full);
-    prettyParse("lsr", 2, use_full);
+    prettyLex("add", 2, use_full);
+    prettyLex("sub", 2, use_full);
+    prettyLex("and", 2, use_full);
+    prettyLex("xor", 2, use_full);
+    prettyLex("lsl", 2, use_full);
+    prettyLex("lsr", 2, use_full);
 
     cout << endl;
 
-    prettyParse("mov", 2, use_full);
-    prettyParse("ldr", 2, use_full);
-    prettyParse("str", 2, use_full);
+    prettyLex("mov", 2, use_full);
+    prettyLex("ldr", 2, use_full);
+    prettyLex("str", 2, use_full);
 
     cout << endl;
 
-    prettyParse("b", 2, use_full);
-    prettyParse("bz", 2, use_full);
-    prettyParse("bp", 2, use_full);
-    prettyParse("br", 2, use_full);
-    prettyParse("bl", 2, use_full);
+    prettyLex("b", 2, use_full);
+    prettyLex("bz", 2, use_full);
+    prettyLex("bp", 2, use_full);
+    prettyLex("br", 2, use_full);
+    prettyLex("bl", 2, use_full);
 
     cout << endl;
 
-    prettyParse("stdin", 2, use_full);
-    prettyParse("stdout", 2, use_full);
+    prettyLex("stdin", 2, use_full);
+    prettyLex("stdout", 2, use_full);
 
     cout << endl;
 
-    prettyParse("\n", 2, use_full);
-    prettyParse(";", 2, use_full);
-    prettyParse(",", 2, use_full);
-    prettyParse("{", 2, use_full);
-    prettyParse("}", 2, use_full);
-    prettyParse(" \t   \t    \t\t ", 2, use_full);
+    prettyLex("\n", 2, use_full);
+    prettyLex(";", 2, use_full);
+    prettyLex(",", 2, use_full);
+    prettyLex("{", 2, use_full);
+    prettyLex("}", 2, use_full);
+    prettyLex(" \t   \t    \t\t ", 2, use_full);
 }
 
 string readFile(string filename) {
@@ -403,7 +403,7 @@ string readFile(string filename) {
 
 int main(int argc, char** argv) {
     if (argc == 1) {
-        cout << "Use: ./parser <filename> <mode> <full>" << endl;
+        cout << "Use: ./lexer <filename> <mode> <full>" << endl;
         cout << "   <mode>:" << endl;
         cout << "       0: Use line numbers and newlines" << endl;
         cout << "       1: Use newlines" << endl;
@@ -421,7 +421,7 @@ int main(int argc, char** argv) {
     string filename = argv[1];
     string assembly_code = readFile(filename);
 
-    prettyParse(assembly_code, atoi(argv[2]), atoi(argv[3])==1);
+    prettyLex(assembly_code, atoi(argv[2]), atoi(argv[3])==1);
 
     return 0;
 }

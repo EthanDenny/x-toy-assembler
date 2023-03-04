@@ -289,7 +289,7 @@ Token grabToken(string* text) {
     return t;
 }
 
-vector<Token> parse(string text) {
+vector<Token> lex(string text) {
     vector<Token> tokens;
 
     while (true) {
@@ -304,7 +304,7 @@ vector<Token> parse(string text) {
     return tokens;
 }
 
-vector<Statement> lex(vector<Token> tokens) {
+vector<Statement> parse(vector<Token> tokens) {
     vector<Statement> statements;
     int i = 0;
 
@@ -553,9 +553,9 @@ int main(int argc, char** argv) {
     string filename = argv[1];
     string assembly_code = readFile(filename);
 
-    vector<Token> tokens = parse(assembly_code);
+    vector<Token> tokens = lex(assembly_code);
     tokens = preprocess(&mem_values, tokens);
-    vector<Statement> statements = lex(tokens);
+    vector<Statement> statements = parse(tokens);
     assemble(&mem_values, statements);
     outputMemory(mem_values);
 

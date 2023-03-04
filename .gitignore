@@ -39,4 +39,4 @@
 
 # Compiled files on Linux
 assembler
-parser
+lexer
