@@ -92,13 +92,13 @@ Token grabToken(string* text, int line) {
         t.type = BRANCH_ZERO;
     }
     else if (tryConsume(text, "bp")) {
-        t.type = BRANCH_LINK;
+        t.type = BRANCH_POSITIVE;
     }
     else if (tryConsume(text, "br")) {
         t.type = BRANCH_REGISTER;
     }
     else if (tryConsume(text, "bl")) {
-        t.type = BRANCH_POSITIVE;
+        t.type = BRANCH_LINK;
     }
     else if (tryConsume(text, "b")) {
         t.type = BRANCH;
@@ -252,6 +252,10 @@ Token grabToken(string* text, int line) {
         else {
             throwException("Unknown token", line);
         }
+    }
+
+    if (t.type == UNKNOWN) {
+        throwException("Lexer error (unknown token)", line);
     }
 
     return t;
