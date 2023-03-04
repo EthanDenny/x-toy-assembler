@@ -37,6 +37,9 @@
 # Batch
 *.bat
 
-# Compiled files on Linux
-assembler
-lexer
+# Build folder
+/build
+
+# ASSEMBLYTOY and TOY files
+*.atoy
+*.toy
