@@ -1,28 +1,28 @@
+# Compiler and linker settings
 CC = g++
 CFLAGS = -g -Wall
+LFLAGS = 
 
-default: main
+# Directories
+SRCDIR = src
+BUILDDIR = build
 
-main: main.o exception.o lexer.o parser.o
-	$(CC) $(CFLAGS) main.o exception.o lexer.o parser.o -o main
+# Files to compile
+SOURCES = $(wildcard $(SRCDIR)/*.cpp)
+OBJECTS = $(patsubst $(SRCDIR)/%.cpp,$(BUILDDIR)/%.o,$(SOURCES))
 
-main.o: parser.h lexer.h types.h
-	$(CC) $(CFLAGS) -c main.cpp
+# Name of the executable
+TARGET = $(BUILDDIR)\main
 
-parser: parser.o lexer.o
-	$(CC) $(CFLAGS) parser.o lexer.o -o parser
+default: $(TARGET)
 
-parser.o: parser.cpp exception.h lexer.h types.h
-	$(CC) $(CFLAGS) -c parser.cpp
+$(TARGET): $(OBJECTS)
+	$(CC) $(LFLAGS) $^ -o $@
+	-del $(BUILDDIR)\*.o
 
-lexer: lexer.o
-	$(CC) $(CFLAGS) lexer.o -o lexer
-
-lexer.o: lexer.cpp exception.h types.h
-	$(CC) $(CFLAGS) -c lexer.cpp
-
-exception.o:
-	$(CC) $(CFLAGS) -c exception.cpp
+$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	-del main parser lexer exception *.o *.exe *.out
+	-del $(BUILDDIR)\*.o $(TARGET)
+	-del $(TARGET).exe
