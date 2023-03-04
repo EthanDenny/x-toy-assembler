@@ -1,13 +1,13 @@
 CC = g++
 CFLAGS = -g -Wall
 
-default: lexer
+default: parser
 
-assembler: assembler.o
-	$(CC) $(CFLAGS) assembler.o -o assembler
+parser: parser.o lexer.o
+	$(CC) $(CFLAGS) parser.o lexer.o -o parser
 
-assembler.o: assembler.cpp types.h
-	$(CC) $(CFLAGS) -c assembler.cpp
+parser.o: parser.cpp lexer.h types.h
+	$(CC) $(CFLAGS) -c parser.cpp
 
 lexer: lexer.o
 	$(CC) $(CFLAGS) lexer.o -o lexer
@@ -16,4 +16,4 @@ lexer.o: lexer.cpp types.h
 	$(CC) $(CFLAGS) -c lexer.cpp
 
 clean:
-	-del assembler lexer *.o *.exe *.out
+	-del parser lexer *.o *.exe *.out

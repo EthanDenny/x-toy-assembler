@@ -5,6 +5,8 @@
 
 #include "types.h"
 
+using namespace std;
+
 bool isAlpha(char c) {
     return c == '_' || isalnum(c);
 }
@@ -401,6 +403,7 @@ string readFile(string filename) {
     return content;
 }
 
+/*
 int main(int argc, char** argv) {
     if (argc == 1) {
         cout << "Use: ./lexer <filename> <mode> <full>" << endl;
@@ -425,3 +428,4 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+*/

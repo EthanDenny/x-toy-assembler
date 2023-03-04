@@ -1,8 +1,7 @@
 #ifndef TYPES
+#define TYPES
 
 #include <string>
-
-using namespace std;
 
 enum token_type {
     DATA,
@@ -48,7 +47,7 @@ enum token_type {
     UNKNOWN
 };
 
-string TokenTypeDescriptors[] =
+static std::string TokenTypeDescriptors[] =
 {
     "DATA",
     "DEFINE",
@@ -93,7 +92,7 @@ string TokenTypeDescriptors[] =
     "UNKNOWN"
 };
 
-string TokenTypeDescriptorsFull[] =
+static std::string TokenTypeDescriptorsFull[] =
 {
     "DATA",
     "DEFINE",
@@ -140,7 +139,7 @@ string TokenTypeDescriptorsFull[] =
 
 typedef struct token {
     token_type type = UNKNOWN;
-    string value;
+    std::string value;
 } Token;
 
 typedef struct statement {
