@@ -257,15 +257,11 @@ Token grabToken(string* text, int line) {
     return t;
 }
 
-Token grabToken(string* text) {
-    return grabToken(text, -1);
-}
-
 vector<Token> lex(string text) {
     vector<Token> tokens;
 
     while (true) {
-        Token nextToken = grabToken(&text);
+        Token nextToken = grabToken(&text, -1);
         
         if (nextToken.type != END) {
             tokens.push_back(nextToken);

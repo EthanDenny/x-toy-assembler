@@ -21,5 +21,8 @@ lexer: lexer.o
 lexer.o: lexer.cpp exception.h types.h
 	$(CC) $(CFLAGS) -c lexer.cpp
 
+exception.o:
+	$(CC) $(CFLAGS) -c exception.cpp
+
 clean:
 	-del main parser lexer exception *.o *.exe *.out

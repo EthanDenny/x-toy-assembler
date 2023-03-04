@@ -5,9 +5,10 @@ using namespace std;
 
 void parse(string text) {
     Token t;
+    int line = 1;
 
     while (t.type != END) {
-        t = grabToken(&text);
+        t = grabToken(&text, line);
 
         if (t.type == UNKNOWN) {
             // Throw an error: Unknown token, which should have been handled by the lexer
@@ -69,8 +70,11 @@ void parse(string text) {
         else if (t.type == STDOUT) {
             // Add functionality
         }
-        else if (t.type == COMMENT || t.type == NEWLINE || t.type == WHITESPACE) {
+        else if (t.type == COMMENT || t.type == WHITESPACE) {
             // Do nothing
+        }
+        else if (t.type == NEWLINE) {
+            line++;
         }
         else {
             // Throw an error: Unexpected token
