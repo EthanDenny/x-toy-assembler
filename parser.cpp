@@ -1,8 +1,4 @@
-#include "types.h"
 #include "lexer.h"
+#include "types.h"
 
 using namespace std;
-
-int main() {
-
-}
