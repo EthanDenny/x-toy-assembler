@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 
+#include "exception.h"
 #include "types.h"
 
 using namespace std;
@@ -50,7 +51,7 @@ char peekNext(string* text) {
     return getChar(text, 1);
 }
 
-Token grabToken(string* text) {
+Token grabToken(string* text, int line) {
     Token t;
 
     if (text->length() == 0) {
@@ -140,7 +141,7 @@ Token grabToken(string* text) {
                     C = consume(text);
                 }
             }
-            if (peek(text) == '*') {
+            else if (peek(text) == '*') {
                 t.type = COMMENT;
                 char C = '/';
                 do {
@@ -150,7 +151,9 @@ Token grabToken(string* text) {
                     }
                 } while (C != EOF);
             }
-            // Throw an exception here: Expected a comment
+            else {
+                throwException("Expected a comment", line);
+            }
         }
         else if (c == '"') {
             t.type = STRING;
@@ -162,7 +165,7 @@ Token grabToken(string* text) {
                 C = consume(text);
 
                 if (C == '\n' || C == EOF) {
-                    // Throw an exception here: Expected closing quotes
+                    throwException("Expected closing quotes", line);
                 }
 
                 if (escape) {
@@ -182,7 +185,7 @@ Token grabToken(string* text) {
         }
         else if (c == '#') {
             if (!isdigit(peek(text))) {
-                // Throw an exception here: Expected a digit
+                throwException("Expected a digit after '#'", line);
             }
             else {
                 t.type = IMMEDIATE;
@@ -195,18 +198,28 @@ Token grabToken(string* text) {
             t.type = HEX;
 
             int i;
-            for (i = 0; i < 4; i++) {
+
+            for (i = 0; i < 2; i++) {
                 if (isxdigit(peek(text))) {
                     t.value += consume(text);
                 }
                 else {
-                    // Throw an exception here: Expected a hex digit
-                    break;
+                    throwException("Expected a hex digit", line);
                 }
             }
-
-            for (int j = 0; j < 4 - i; j++) {
-                t.value = '0' + t.value;
+            
+            if (isxdigit(peek(text))) {
+                for (i = 0; i < 2; i++) {
+                    if (isxdigit(peek(text))) {
+                        t.value += consume(text);
+                    }
+                    else {
+                        throwException("Expected a hex digit", line);
+                    }
+                }
+            }
+            else {
+                t.value = "00" + t.value;
             }
         }
         else if (c == '_' || isalpha(c)) {
@@ -227,24 +240,25 @@ Token grabToken(string* text) {
             }
 
             if (t.type == UNKNOWN) {
+                t.type = LABEL;
+
                 while (isAlpha(peek(text))) {
                     t.value += consume(text);
                 }
 
-                if (tryConsume(text, ":")) {
-                    t.type = LABEL;
-                }
-                else {
-                    // Throw an exception here: Unknown token
-                }
+                tryConsume(text, ":");
             }
         }
         else {
-            // Throw an exception here: Unknown token
+            throwException("Unknown token", line);
         }
     }
 
     return t;
+}
+
+Token grabToken(string* text) {
+    return grabToken(text, -1);
 }
 
 vector<Token> lex(string text) {
