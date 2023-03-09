@@ -12,17 +12,34 @@ SOURCES = $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS = $(patsubst $(SRCDIR)/%.cpp,$(BUILDDIR)/%.o,$(SOURCES))
 
 # Name of the executable
-TARGET = $(BUILDDIR)\main
+ifeq ($(OS), Windows_NT)
+    TARGET = $(BUILDDIR)\main
+else
+    TARGET = $(BUILDDIR)/main
+endif
 
 default: $(TARGET)
 
 $(TARGET): $(OBJECTS)
 	$(CC) $(LFLAGS) $^ -o $@
-	-del $(BUILDDIR)\*.o
+
+    ifeq ($(OS), Windows_NT)
+		-del $(BUILDDIR)\*.o
+    else
+		-rm -f $(BUILDDIR)/*.o
+    endif
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
+    ifeq ($(OS), Windows_NT)
+		if not exist build mkdir build
+    else
+		mkdir -p build
+    endif
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	-del $(BUILDDIR)\*.o $(TARGET)
-	-del $(TARGET).exe
+    ifeq ($(OS), Windows_NT)
+		-del $(BUILDDIR)\*.o $(TARGET) $(TARGET).exe
+    else
+		-rm -f $(BUILDDIR)/*.o $(TARGET) $(TARGET).exe
+    endif
