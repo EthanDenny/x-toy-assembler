@@ -83,10 +83,30 @@ void parse(string text) {
             // Add functionality
         }
         else if (t.type == LDR) {
-            // Add functionality
+            string mem;
+            string reg;
+
+            tryGrabToken(&text, WHITESPACE);
+            mem = tryGrabToken(&text, MEMORY);
+            tryGrabToken(&text, COMMA);
+            tryGrabToken(&text, WHITESPACE);
+            reg = tryGrabToken(&text, REGISTER);
+            tryGrabToken(&text, TERMINATOR);
+
+            writeMemory("8" + reg + mem);
         }
         else if (t.type == STR) {
-            // Add functionality
+            string mem;
+            string reg;
+
+            tryGrabToken(&text, WHITESPACE);
+            mem = tryGrabToken(&text, MEMORY);
+            tryGrabToken(&text, COMMA);
+            tryGrabToken(&text, WHITESPACE);
+            reg = tryGrabToken(&text, REGISTER);
+            tryGrabToken(&text, TERMINATOR);
+
+            writeMemory("9" + reg + mem);
         }
         else if (t.type == BRANCH) {
             // Add functionality
@@ -120,10 +140,22 @@ void parse(string text) {
             writeMemory("F" + reg + mem);
         }
         else if (t.type == STDIN) {
-            // Add functionality
+            string reg;
+
+            tryGrabToken(&text, WHITESPACE);
+            reg = tryGrabToken(&text, REGISTER);
+            tryGrabToken(&text, TERMINATOR);
+
+            writeMemory("8" + reg + "FF");
         }
         else if (t.type == STDOUT) {
-            // Add functionality
+            string reg;
+
+            tryGrabToken(&text, WHITESPACE);
+            reg = tryGrabToken(&text, REGISTER);
+            tryGrabToken(&text, TERMINATOR);
+
+            writeMemory("9" + reg + "FF");
         }
         else if (t.type == COMMENT || t.type == WHITESPACE) {
             // Do nothing
