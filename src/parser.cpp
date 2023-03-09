@@ -41,7 +41,7 @@ string tryGrabToken(string* text, token_type type, bool throw_exception) {
 }
 
 string tryGrabToken(string* text, token_type type) {
-    tryGrabToken(text, type, true);
+    return tryGrabToken(text, type, true);
 }
 
 void parse(string text) {
