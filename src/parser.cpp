@@ -26,6 +26,7 @@ void writeMemory(string statement) {
 }
 
 string tryGrabToken(string* text, token_type type, bool throw_exception) {
+    string original_text = *text; // This is terrible design, fix later
     Token t = grabToken(text, line);
 
     if (type == TERMINATOR) {
@@ -33,8 +34,14 @@ string tryGrabToken(string* text, token_type type, bool throw_exception) {
             throwException("Expected end of statement", line);
         }
     }
-    else if (t.type != type && throw_exception) {
-        throwException("Expected " + TokenTypeDescriptorsFull[type], line);
+    else if (t.type != type) {
+        if (throw_exception) {
+            throwException("Expected " + TokenTypeDescriptorsFull[type], line);
+        }
+        else {
+            *text = original_text; // Return the token, again, terrible
+            return "~";
+        }
     }
 
     return t.value;
@@ -62,22 +69,142 @@ void parse(string text) {
             // This is also complicated to implement
         }
         else if (t.type == ADD) {
-            // Add functionality
+            string a;
+            string b;
+            string c;
+            
+            tryGrabToken(&text, WHITESPACE);
+            a = tryGrabToken(&text, REGISTER);
+            tryGrabToken(&text, COMMA);
+            tryGrabToken(&text, WHITESPACE);
+            b = tryGrabToken(&text, REGISTER);
+
+            string v = tryGrabToken(&text, COMMA, false);
+            if (v == "~") { // The next token was NOT a comma
+                tryGrabToken(&text, TERMINATOR);
+                writeMemory("1" + a + a + b);
+            }
+            else {
+                tryGrabToken(&text, WHITESPACE);
+                c = tryGrabToken(&text, REGISTER);
+                tryGrabToken(&text, TERMINATOR);
+                writeMemory("1" + a + b + c);
+            }
         }
         else if (t.type == SUB) {
-            // Add functionality
+            string a;
+            string b;
+            string c;
+            
+            tryGrabToken(&text, WHITESPACE);
+            a = tryGrabToken(&text, REGISTER);
+            tryGrabToken(&text, COMMA);
+            tryGrabToken(&text, WHITESPACE);
+            b = tryGrabToken(&text, REGISTER);
+
+            string v = tryGrabToken(&text, COMMA, false);
+            if (v == "~") { // The next token was NOT a comma
+                tryGrabToken(&text, TERMINATOR);
+                writeMemory("2" + a + a + b);
+            }
+            else {
+                tryGrabToken(&text, WHITESPACE);
+                c = tryGrabToken(&text, REGISTER);
+                tryGrabToken(&text, TERMINATOR);
+                writeMemory("2" + a + b + c);
+            }
         }
         else if (t.type == AND) {
-            // Add functionality
+            string a;
+            string b;
+            string c;
+            
+            tryGrabToken(&text, WHITESPACE);
+            a = tryGrabToken(&text, REGISTER);
+            tryGrabToken(&text, COMMA);
+            tryGrabToken(&text, WHITESPACE);
+            b = tryGrabToken(&text, REGISTER);
+
+            string v = tryGrabToken(&text, COMMA, false);
+            if (v == "~") { // The next token was NOT a comma
+                tryGrabToken(&text, TERMINATOR);
+                writeMemory("3" + a + a + b);
+            }
+            else {
+                tryGrabToken(&text, WHITESPACE);
+                c = tryGrabToken(&text, REGISTER);
+                tryGrabToken(&text, TERMINATOR);
+                writeMemory("3" + a + b + c);
+            }
         }
         else if (t.type == XOR) {
-            // Add functionality
+            string a;
+            string b;
+            string c;
+            
+            tryGrabToken(&text, WHITESPACE);
+            a = tryGrabToken(&text, REGISTER);
+            tryGrabToken(&text, COMMA);
+            tryGrabToken(&text, WHITESPACE);
+            b = tryGrabToken(&text, REGISTER);
+
+            string v = tryGrabToken(&text, COMMA, false);
+            if (v == "~") { // The next token was NOT a comma
+                tryGrabToken(&text, TERMINATOR);
+                writeMemory("4" + a + a + b);
+            }
+            else {
+                tryGrabToken(&text, WHITESPACE);
+                c = tryGrabToken(&text, REGISTER);
+                tryGrabToken(&text, TERMINATOR);
+                writeMemory("4" + a + b + c);
+            }
         }
         else if (t.type == LSL) {
-            // Add functionality
+            string a;
+            string b;
+            string c;
+            
+            tryGrabToken(&text, WHITESPACE);
+            a = tryGrabToken(&text, REGISTER);
+            tryGrabToken(&text, COMMA);
+            tryGrabToken(&text, WHITESPACE);
+            b = tryGrabToken(&text, REGISTER);
+
+            string has_comma = tryGrabToken(&text, COMMA, false);
+            if (has_comma == "~") { // The next token was NOT a comma
+                tryGrabToken(&text, TERMINATOR);
+                writeMemory("5" + a + a + b);
+            }
+            else {
+                tryGrabToken(&text, WHITESPACE);
+                c = tryGrabToken(&text, REGISTER);
+                tryGrabToken(&text, TERMINATOR);
+                writeMemory("5" + a + b + c);
+            }
         }
         else if (t.type == LSR) {
-            // Add functionality
+            string a;
+            string b;
+            string c;
+            
+            tryGrabToken(&text, WHITESPACE);
+            a = tryGrabToken(&text, REGISTER);
+            tryGrabToken(&text, COMMA);
+            tryGrabToken(&text, WHITESPACE);
+            b = tryGrabToken(&text, REGISTER);
+
+            string has_comma = tryGrabToken(&text, COMMA, false);
+            if (has_comma == "~") { // The next token was NOT a comma
+                tryGrabToken(&text, TERMINATOR);
+                writeMemory("6" + a + a + b);
+            }
+            else {
+                tryGrabToken(&text, WHITESPACE);
+                c = tryGrabToken(&text, REGISTER);
+                tryGrabToken(&text, TERMINATOR);
+                writeMemory("6" + a + b + c);
+            }
         }
         else if (t.type == MOV) {
             // Add functionality
