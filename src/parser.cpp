@@ -10,6 +10,7 @@
 using namespace std;
 
 int memory = 16;
+int line;
 
 string convertToHex(int num) {
     stringstream ss;
@@ -24,9 +25,28 @@ void writeMemory(string statement) {
     memory++;
 }
 
+string tryGrabToken(string* text, token_type type, bool throw_exception) {
+    Token t = grabToken(text, line);
+
+    if (type == TERMINATOR) {
+        if (t.type != SEMICOLON && t.type != NEWLINE && t.type != END) {
+            throwException("Expected end of statement", line);
+        }
+    }
+    else if (t.type != type && throw_exception) {
+        throwException("Expected " + TokenTypeDescriptorsFull[type], line);
+    }
+
+    return t.value;
+}
+
+string tryGrabToken(string* text, token_type type) {
+    tryGrabToken(text, type, true);
+}
+
 void parse(string text) {
     Token t;
-    int line = 1;
+    line = 1;
 
     while (t.type != END) {
         t = grabToken(&text, line);
@@ -80,79 +100,24 @@ void parse(string text) {
         else if (t.type == BRANCH_REGISTER) {
             string reg;
 
-            Token T = grabToken(&text, line);
+            tryGrabToken(&text, WHITESPACE);
+            reg = tryGrabToken(&text, REGISTER);
+            tryGrabToken(&text, TERMINATOR);
 
-            if (T.type == WHITESPACE) {
-                T = grabToken(&text, line);
-            }
-            else {
-                throwException("Expected whitespace", line);
-            }
-
-            if (T.type == REGISTER) {
-                reg = T.value;
-                T = grabToken(&text, line);
-            }
-            else {
-                throwException("Expected register", line);
-            }
-
-            if (T.type == SEMICOLON || T.type == NEWLINE || T.type == END) {
-                writeMemory("E" + reg + "00");
-            }
-            else {
-                throwException("Expected end of statement", line);
-            }
+            writeMemory("E" + reg + "00");
         }
         else if (t.type == BRANCH_LINK) {
             string reg;
             string mem;
 
-            Token T = grabToken(&text, line);
+            tryGrabToken(&text, WHITESPACE);
+            reg = tryGrabToken(&text, REGISTER);
+            tryGrabToken(&text, COMMA);
+            tryGrabToken(&text, WHITESPACE);
+            mem = tryGrabToken(&text, MEMORY);
+            tryGrabToken(&text, TERMINATOR);
 
-            if (T.type == WHITESPACE) {
-                T = grabToken(&text, line);
-            }
-            else {
-                throwException("Expected whitespace", line);
-            }
-
-            if (T.type == REGISTER) {
-                reg = T.value;
-                T = grabToken(&text, line);
-            }
-            else {
-                throwException("Expected register", line);
-            }
-
-            if (T.type == COMMA) {
-                T = grabToken(&text, line);
-            }
-            else {
-                throwException("Expected comma", line);
-            }
-
-            if (T.type == WHITESPACE) {
-                T = grabToken(&text, line);
-            }
-            else {
-                throwException("Expected whitespace", line);
-            }
-
-            if (T.type == MEMORY) {
-                mem = T.value;
-                T = grabToken(&text, line);
-            }
-            else {
-                throwException("Expected memory address", line);
-            }
-
-            if (T.type == SEMICOLON || T.type == NEWLINE || T.type == END) {
-                writeMemory("F" + reg + mem);
-            }
-            else {
-                throwException("Expected end of statement", line);
-            }
+            writeMemory("F" + reg + mem);
         }
         else if (t.type == STDIN) {
             // Add functionality

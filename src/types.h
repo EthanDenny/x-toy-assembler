@@ -44,7 +44,9 @@ enum token_type {
 
     END,
 
-    UNKNOWN
+    UNKNOWN,
+
+    TERMINATOR
 };
 
 static std::string TokenTypeDescriptors[] =
@@ -89,7 +91,9 @@ static std::string TokenTypeDescriptors[] =
 
     "END",
 
-    "UNKNOWN"
+    "UNKNOWN",
+
+    "TERMINATOR (SPECIAL)"
 };
 
 static std::string TokenTypeDescriptorsFull[] =
@@ -134,7 +138,9 @@ static std::string TokenTypeDescriptorsFull[] =
 
     "END",
 
-    "UNKNOWN"
+    "UNKNOWN",
+
+    "TERMINATOR (SPECIAL)"
 };
 
 typedef struct token {
