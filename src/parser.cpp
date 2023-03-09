@@ -207,7 +207,24 @@ void parse(string text) {
             }
         }
         else if (t.type == MOV) {
-            // Add functionality
+            string dest;
+            string src;
+            string imm;
+            string hex;
+            
+            tryGrabToken(&text, WHITESPACE);
+            dest = tryGrabToken(&text, REGISTER);
+            tryGrabToken(&text, COMMA);
+            tryGrabToken(&text, WHITESPACE);
+
+            src = tryGrabToken(&text, REGISTER, false);
+            if (src != "~") { // The next token WAS a register
+                tryGrabToken(&text, TERMINATOR);
+                writeMemory("1" + dest + src + "0");
+            }
+            else {
+                // Add immediate and hex functionality
+            }
         }
         else if (t.type == LDR) {
             string mem;
