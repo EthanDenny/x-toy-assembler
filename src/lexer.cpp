@@ -1,27 +1,16 @@
-#include <iostream>
 #include <string>
-#include <vector>
 
 #include "exception.h"
 #include "types.h"
 
 using namespace std;
 
-bool isAlpha(char c) {
-    return c == '_' || isalnum(c);
-}
-
-char getChar(string* text, int i) {
-    if ((int) text->length() > i) {
-        return (*text)[i];
-    }
-    else {
-        return EOF;
-    }
+char peek(string* text, int* index) {
+    return (*text)[*index];
 }
 
 char consume(string* text, int* index) {
-    char ch = getChar(text, *index);
+    char ch = peek(text, index);
     *index += 1;
     return ch;
 }
@@ -34,14 +23,6 @@ bool tryConsume(string* text, int* index, string sub) {
     else {
         return false;
     }
-}
-
-char peek(string* text, int* index) {
-    return getChar(text, *index);
-}
-
-char peekNext(string* text, int* index) {
-    return getChar(text, *index + 1);
 }
 
 Token grabToken(string* text, int* index, int line) {
@@ -136,13 +117,10 @@ Token grabToken(string* text, int* index, int line) {
             }
             else if (peek(text, index) == '*') {
                 t.type = COMMENT;
-                char C = '/';
-                do {
+                char C;
+                while (C != EOF && !(C == '*' && tryConsume(text, index, "/"))) {
                     C = consume(text, index);
-                    if (C == '*' && tryConsume(text, index, "/")) {
-                        break;
-                    }
-                } while (C != EOF);
+                }
             }
             else {
                 throwException("Expected a comment", line);
@@ -234,8 +212,8 @@ Token grabToken(string* text, int* index, int line) {
 
             if (t.type == UNKNOWN) {
                 t.type = LABEL;
-
-                while (isAlpha(peek(text, index))) {
+                
+                while (peek(text, index) == '_' || isalnum(peek(text, index))) {
                     t.value += consume(text, index);
                 }
 
