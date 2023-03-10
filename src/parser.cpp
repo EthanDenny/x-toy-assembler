@@ -57,12 +57,61 @@ string tryGrabToken(string* text, token_type type) {
     return tryGrabToken(text, type, true);
 }
 
-void parse(string text) {
+void ALStatement(string* text, string opcode) {
+    string a;
+    string b;
+    string c;
+    
+    tryGrabToken(text, WHITESPACE);
+    a = tryGrabToken(text, REGISTER);
+    tryGrabToken(text, COMMA);
+    tryGrabToken(text, WHITESPACE);
+    b = tryGrabToken(text, REGISTER);
+
+    string v = tryGrabToken(text, COMMA, false);
+    if (v == "~") { // The next token was NOT a comma
+        tryGrabToken(text, TERMINATOR);
+        writeMemory(opcode + a + a + b);
+    }
+    else {
+        tryGrabToken(text, WHITESPACE);
+        c = tryGrabToken(text, REGISTER);
+        tryGrabToken(text, TERMINATOR);
+        writeMemory(opcode + a + b + c);
+    }
+}
+
+void singleRegStatement(string* text, string opcode, string addr) {
+    string reg;
+
+    tryGrabToken(text, WHITESPACE);
+    reg = tryGrabToken(text, REGISTER);
+    tryGrabToken(text, TERMINATOR);
+
+    writeMemory(opcode + reg + addr);
+}
+
+void regMemStatement(string* text, string opcode) {
+    string reg;
+    string mem;
+
+    tryGrabToken(text, WHITESPACE);
+    reg = tryGrabToken(text, REGISTER);
+    tryGrabToken(text, COMMA);
+    tryGrabToken(text, WHITESPACE);
+    mem = tryGrabToken(text, MEMORY);
+    tryGrabToken(text, TERMINATOR);
+
+    writeMemory(opcode + reg + mem);
+}
+
+
+void parse(string* text) {
     Token t;
     line = 1;
 
     while (t.type != END) {
-        t = grabToken(&text, &code_index, line);
+        t = grabToken(text, &code_index, line);
 
         if (t.type == DATA) {
             // This is complicated to implement
@@ -75,142 +124,22 @@ void parse(string text) {
             // This is also complicated to implement
         }
         else if (t.type == ADD) {
-            string a;
-            string b;
-            string c;
-            
-            tryGrabToken(&text, WHITESPACE);
-            a = tryGrabToken(&text, REGISTER);
-            tryGrabToken(&text, COMMA);
-            tryGrabToken(&text, WHITESPACE);
-            b = tryGrabToken(&text, REGISTER);
-
-            string v = tryGrabToken(&text, COMMA, false);
-            if (v == "~") { // The next token was NOT a comma
-                tryGrabToken(&text, TERMINATOR);
-                writeMemory("1" + a + a + b);
-            }
-            else {
-                tryGrabToken(&text, WHITESPACE);
-                c = tryGrabToken(&text, REGISTER);
-                tryGrabToken(&text, TERMINATOR);
-                writeMemory("1" + a + b + c);
-            }
+            ALStatement(text, "1");
         }
         else if (t.type == SUB) {
-            string a;
-            string b;
-            string c;
-            
-            tryGrabToken(&text, WHITESPACE);
-            a = tryGrabToken(&text, REGISTER);
-            tryGrabToken(&text, COMMA);
-            tryGrabToken(&text, WHITESPACE);
-            b = tryGrabToken(&text, REGISTER);
-
-            string v = tryGrabToken(&text, COMMA, false);
-            if (v == "~") { // The next token was NOT a comma
-                tryGrabToken(&text, TERMINATOR);
-                writeMemory("2" + a + a + b);
-            }
-            else {
-                tryGrabToken(&text, WHITESPACE);
-                c = tryGrabToken(&text, REGISTER);
-                tryGrabToken(&text, TERMINATOR);
-                writeMemory("2" + a + b + c);
-            }
+            ALStatement(text, "2");
         }
         else if (t.type == AND) {
-            string a;
-            string b;
-            string c;
-            
-            tryGrabToken(&text, WHITESPACE);
-            a = tryGrabToken(&text, REGISTER);
-            tryGrabToken(&text, COMMA);
-            tryGrabToken(&text, WHITESPACE);
-            b = tryGrabToken(&text, REGISTER);
-
-            string v = tryGrabToken(&text, COMMA, false);
-            if (v == "~") { // The next token was NOT a comma
-                tryGrabToken(&text, TERMINATOR);
-                writeMemory("3" + a + a + b);
-            }
-            else {
-                tryGrabToken(&text, WHITESPACE);
-                c = tryGrabToken(&text, REGISTER);
-                tryGrabToken(&text, TERMINATOR);
-                writeMemory("3" + a + b + c);
-            }
+            ALStatement(text, "3");
         }
         else if (t.type == XOR) {
-            string a;
-            string b;
-            string c;
-            
-            tryGrabToken(&text, WHITESPACE);
-            a = tryGrabToken(&text, REGISTER);
-            tryGrabToken(&text, COMMA);
-            tryGrabToken(&text, WHITESPACE);
-            b = tryGrabToken(&text, REGISTER);
-
-            string v = tryGrabToken(&text, COMMA, false);
-            if (v == "~") { // The next token was NOT a comma
-                tryGrabToken(&text, TERMINATOR);
-                writeMemory("4" + a + a + b);
-            }
-            else {
-                tryGrabToken(&text, WHITESPACE);
-                c = tryGrabToken(&text, REGISTER);
-                tryGrabToken(&text, TERMINATOR);
-                writeMemory("4" + a + b + c);
-            }
+            ALStatement(text, "4");
         }
         else if (t.type == LSL) {
-            string a;
-            string b;
-            string c;
-            
-            tryGrabToken(&text, WHITESPACE);
-            a = tryGrabToken(&text, REGISTER);
-            tryGrabToken(&text, COMMA);
-            tryGrabToken(&text, WHITESPACE);
-            b = tryGrabToken(&text, REGISTER);
-
-            string has_comma = tryGrabToken(&text, COMMA, false);
-            if (has_comma == "~") { // The next token was NOT a comma
-                tryGrabToken(&text, TERMINATOR);
-                writeMemory("5" + a + a + b);
-            }
-            else {
-                tryGrabToken(&text, WHITESPACE);
-                c = tryGrabToken(&text, REGISTER);
-                tryGrabToken(&text, TERMINATOR);
-                writeMemory("5" + a + b + c);
-            }
+            ALStatement(text, "5");
         }
         else if (t.type == LSR) {
-            string a;
-            string b;
-            string c;
-            
-            tryGrabToken(&text, WHITESPACE);
-            a = tryGrabToken(&text, REGISTER);
-            tryGrabToken(&text, COMMA);
-            tryGrabToken(&text, WHITESPACE);
-            b = tryGrabToken(&text, REGISTER);
-
-            string has_comma = tryGrabToken(&text, COMMA, false);
-            if (has_comma == "~") { // The next token was NOT a comma
-                tryGrabToken(&text, TERMINATOR);
-                writeMemory("6" + a + a + b);
-            }
-            else {
-                tryGrabToken(&text, WHITESPACE);
-                c = tryGrabToken(&text, REGISTER);
-                tryGrabToken(&text, TERMINATOR);
-                writeMemory("6" + a + b + c);
-            }
+            ALStatement(text, "6");
         }
         else if (t.type == MOV) {
             string dest;
@@ -218,14 +147,14 @@ void parse(string text) {
             string imm;
             string hex;
             
-            tryGrabToken(&text, WHITESPACE);
-            dest = tryGrabToken(&text, REGISTER);
-            tryGrabToken(&text, COMMA);
-            tryGrabToken(&text, WHITESPACE);
+            tryGrabToken(text, WHITESPACE);
+            dest = tryGrabToken(text, REGISTER);
+            tryGrabToken(text, COMMA);
+            tryGrabToken(text, WHITESPACE);
 
-            src = tryGrabToken(&text, REGISTER, false);
+            src = tryGrabToken(text, REGISTER, false);
             if (src != "~") { // The next token WAS a register
-                tryGrabToken(&text, TERMINATOR);
+                tryGrabToken(text, TERMINATOR);
                 writeMemory("1" + dest + src + "0");
             }
             else {
@@ -233,30 +162,10 @@ void parse(string text) {
             }
         }
         else if (t.type == LDR) {
-            string mem;
-            string reg;
-
-            tryGrabToken(&text, WHITESPACE);
-            mem = tryGrabToken(&text, MEMORY);
-            tryGrabToken(&text, COMMA);
-            tryGrabToken(&text, WHITESPACE);
-            reg = tryGrabToken(&text, REGISTER);
-            tryGrabToken(&text, TERMINATOR);
-
-            writeMemory("8" + reg + mem);
+            regMemStatement(text, "8");
         }
         else if (t.type == STR) {
-            string mem;
-            string reg;
-
-            tryGrabToken(&text, WHITESPACE);
-            mem = tryGrabToken(&text, MEMORY);
-            tryGrabToken(&text, COMMA);
-            tryGrabToken(&text, WHITESPACE);
-            reg = tryGrabToken(&text, REGISTER);
-            tryGrabToken(&text, TERMINATOR);
-
-            writeMemory("9" + reg + mem);
+            regMemStatement(text, "9");
         }
         else if (t.type == BRANCH) {
             // Add functionality
@@ -268,44 +177,16 @@ void parse(string text) {
             // Add functionality
         }
         else if (t.type == BRANCH_REGISTER) {
-            string reg;
-
-            tryGrabToken(&text, WHITESPACE);
-            reg = tryGrabToken(&text, REGISTER);
-            tryGrabToken(&text, TERMINATOR);
-
-            writeMemory("E" + reg + "00");
+            singleRegStatement(text, "E", "00");
         }
         else if (t.type == BRANCH_LINK) {
-            string reg;
-            string mem;
-
-            tryGrabToken(&text, WHITESPACE);
-            reg = tryGrabToken(&text, REGISTER);
-            tryGrabToken(&text, COMMA);
-            tryGrabToken(&text, WHITESPACE);
-            mem = tryGrabToken(&text, MEMORY);
-            tryGrabToken(&text, TERMINATOR);
-
-            writeMemory("F" + reg + mem);
+            regMemStatement(text, "F");
         }
         else if (t.type == STDIN) {
-            string reg;
-
-            tryGrabToken(&text, WHITESPACE);
-            reg = tryGrabToken(&text, REGISTER);
-            tryGrabToken(&text, TERMINATOR);
-
-            writeMemory("8" + reg + "FF");
+            singleRegStatement(text, "8", "FF");
         }
         else if (t.type == STDOUT) {
-            string reg;
-
-            tryGrabToken(&text, WHITESPACE);
-            reg = tryGrabToken(&text, REGISTER);
-            tryGrabToken(&text, TERMINATOR);
-
-            writeMemory("9" + reg + "FF");
+            singleRegStatement(text, "9", "FF");
         }
         else if (t.type == COMMENT || t.type == WHITESPACE) {
             // Do nothing

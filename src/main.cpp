@@ -27,5 +27,5 @@ int main(int argc, char** argv) {
     string filename = argv[1];
     string assembly_code = readFile(filename);
 
-    parse(assembly_code);
+    parse(&assembly_code);
 }
