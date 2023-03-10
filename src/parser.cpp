@@ -11,6 +11,8 @@ using namespace std;
 
 int memory = 16;
 int line;
+int code_index = 0;
+int prev_code_index;
 
 string convertToHex(int num) {
     stringstream ss;
@@ -26,20 +28,24 @@ void writeMemory(string statement) {
 }
 
 string tryGrabToken(string* text, token_type type, bool throw_exception) {
-    string original_text = *text; // This is terrible design, fix later
-    Token t = grabToken(text, line);
+    int original_index = code_index;
+    prev_code_index = code_index;
+    Token t = grabToken(text, &code_index, line);
 
     if (type == TERMINATOR) {
+        if (t.type == NEWLINE) {
+            line++;
+        }
         if (t.type != SEMICOLON && t.type != NEWLINE && t.type != END) {
             throwException("Expected end of statement", line);
         }
     }
     else if (t.type != type) {
         if (throw_exception) {
-            throwException("Expected " + TokenTypeDescriptorsFull[type], line);
+            throwException("Expected " + TokenTypeDescriptorsFull[type] + " got " + TokenTypeDescriptorsFull[t.type], line);
         }
         else {
-            *text = original_text; // Return the token, again, terrible
+            code_index = original_index;
             return "~";
         }
     }
@@ -56,7 +62,7 @@ void parse(string text) {
     line = 1;
 
     while (t.type != END) {
-        t = grabToken(&text, line);
+        t = grabToken(&text, &code_index, line);
 
         if (t.type == DATA) {
             // This is complicated to implement
@@ -303,9 +309,6 @@ void parse(string text) {
         }
         else if (t.type == COMMENT || t.type == WHITESPACE) {
             // Do nothing
-        }
-        else if (t.type == NEWLINE) {
-            line++;
         }
         else {
             // Throw an error: Unexpected token

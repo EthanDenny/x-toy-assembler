@@ -20,22 +20,15 @@ char getChar(string* text, int i) {
     }
 }
 
-char consume(string* text) {
-    char ch = getChar(text, 0);
-    
-    if (text->length() > 1) {
-        *text = text->substr(1, text->length());
-    }
-    else {
-        *text = "";
-    }
-
+char consume(string* text, int* index) {
+    char ch = getChar(text, *index);
+    *index += 1;
     return ch;
 }
 
-bool tryConsume(string* text, string sub) {
-    if (text->rfind(sub, 0) == 0) {
-        *text = text->substr(sub.length(), text->length() - sub.length());
+bool tryConsume(string* text, int* index, string sub) {
+    if ((int) text->find(sub, *index) == *index) {
+        *index += sub.length();
         return true;
     }
     else {
@@ -43,110 +36,110 @@ bool tryConsume(string* text, string sub) {
     }
 }
 
-char peek(string* text) {
-    return getChar(text, 0);
+char peek(string* text, int* index) {
+    return getChar(text, *index);
 }
 
-char peekNext(string* text) {
-    return getChar(text, 1);
+char peekNext(string* text, int* index) {
+    return getChar(text, *index + 1);
 }
 
-Token grabToken(string* text, int line) {
+Token grabToken(string* text, int* index, int line) {
     Token t;
 
-    if (text->length() == 0) {
+    if ((int) text->length() <= *index) {
         t.type = END;
     }
-    else if (tryConsume(text, " ") || tryConsume(text, "\t")) {
+    else if (tryConsume(text, index, " ") || tryConsume(text, index, "\t")) {
         t.type = WHITESPACE;
-        while (tryConsume(text, " ") || tryConsume(text, "\t")) {}
+        while (tryConsume(text, index, " ") || tryConsume(text, index, "\t")) {}
     }
-    else if (tryConsume(text, ";")) {
+    else if (tryConsume(text, index, ";")) {
         t.type = SEMICOLON;
     }
-    else if (tryConsume(text, ",")) {
+    else if (tryConsume(text, index, ",")) {
         t.type = COMMA;
     }
-    else if (tryConsume(text, "{")) {
+    else if (tryConsume(text, index, "{")) {
         t.type = CURLY_BRACE_LEFT;
     }
-    else if (tryConsume(text, "}")) {
+    else if (tryConsume(text, index, "}")) {
         t.type = CURLY_BRACE_RIGHT;
     }
-    else if (tryConsume(text, ".data")) {
+    else if (tryConsume(text, index, ".data")) {
         t.type = DATA;;
     }
-    else if (tryConsume(text, ".define")) {
+    else if (tryConsume(text, index, ".define")) {
         t.type = DEFINE;
     }
-    else if (tryConsume(text, "\n")) {
+    else if (tryConsume(text, index, "\n")) {
         t.type = NEWLINE;
     }
-    else if (tryConsume(text, "add")) {
+    else if (tryConsume(text, index, "add")) {
         t.type = ADD;
     }
-    else if (tryConsume(text, "and")) {
+    else if (tryConsume(text, index, "and")) {
         t.type = AND;
     }
-    else if (tryConsume(text, "bz")) {
+    else if (tryConsume(text, index, "bz")) {
         t.type = BRANCH_ZERO;
     }
-    else if (tryConsume(text, "bp")) {
+    else if (tryConsume(text, index, "bp")) {
         t.type = BRANCH_POSITIVE;
     }
-    else if (tryConsume(text, "br")) {
+    else if (tryConsume(text, index, "br")) {
         t.type = BRANCH_REGISTER;
     }
-    else if (tryConsume(text, "bl")) {
+    else if (tryConsume(text, index, "bl")) {
         t.type = BRANCH_LINK;
     }
-    else if (tryConsume(text, "b")) {
+    else if (tryConsume(text, index, "b")) {
         t.type = BRANCH;
     }
-    else if (tryConsume(text, "lsl")) {
+    else if (tryConsume(text, index, "lsl")) {
         t.type = LSL;
     }
-    else if (tryConsume(text, "lsr")) {
+    else if (tryConsume(text, index, "lsr")) {
         t.type = LSR;
     }
-    else if (tryConsume(text, "ldr")) {
+    else if (tryConsume(text, index, "ldr")) {
         t.type = LDR;
     }
-    else if (tryConsume(text, "mov")) {
+    else if (tryConsume(text, index, "mov")) {
         t.type = MOV;
     }
-    else if (tryConsume(text, "sub")) {
+    else if (tryConsume(text, index, "sub")) {
         t.type = SUB;
     }
-    else if (tryConsume(text, "str")) {
+    else if (tryConsume(text, index, "str")) {
         t.type = STR;
     }
-    else if (tryConsume(text, "stdin")) {
+    else if (tryConsume(text, index, "stdin")) {
         t.type = STDIN;
     }
-    else if (tryConsume(text, "stdout")) {
+    else if (tryConsume(text, index, "stdout")) {
         t.type = STDOUT;
     }
-    else if (tryConsume(text, "xor")) {
+    else if (tryConsume(text, index, "xor")) {
         t.type = XOR;
     }
     else {
-        char c = consume(text);
+        char c = consume(text, index);
 
         if (c == '/') {
-            if (peek(text) == '/') {
+            if (peek(text, index) == '/') {
                 t.type = COMMENT;
                 char C = '/';
-                while (peek(text) != '\n' && C != EOF) {
-                    C = consume(text);
+                while (peek(text, index) != '\n' && C != EOF) {
+                    C = consume(text, index);
                 }
             }
-            else if (peek(text) == '*') {
+            else if (peek(text, index) == '*') {
                 t.type = COMMENT;
                 char C = '/';
                 do {
-                    C = consume(text);
-                    if (C == '*' && tryConsume(text, "/")) {
+                    C = consume(text, index);
+                    if (C == '*' && tryConsume(text, index, "/")) {
                         break;
                     }
                 } while (C != EOF);
@@ -162,7 +155,7 @@ Token grabToken(string* text, int line) {
             bool escape = false;
 
             while (C != '"') {
-                C = consume(text);
+                C = consume(text, index);
 
                 if (C == '\n' || C == EOF) {
                     throwException("Expected closing quotes", line);
@@ -184,34 +177,34 @@ Token grabToken(string* text, int line) {
             }
         }
         else if (c == '#') {
-            if (!isdigit(peek(text))) {
+            if (!isdigit(peek(text, index))) {
                 throwException("Expected a digit after '#'", line);
             }
             else {
                 t.type = IMMEDIATE;
-                while (isdigit(peek(text))) {
-                    t.value += consume(text);
+                while (isdigit(peek(text, index))) {
+                    t.value += consume(text, index);
                 };
             };
         }
-        else if (c == '0' && tryConsume(text, "x")) {
+        else if (c == '0' && tryConsume(text, index, "x")) {
             t.type = HEX;
 
             int i;
 
             for (i = 0; i < 2; i++) {
-                if (isxdigit(peek(text))) {
-                    t.value += consume(text);
+                if (isxdigit(peek(text, index))) {
+                    t.value += consume(text, index);
                 }
                 else {
                     throwException("Expected a hex digit", line);
                 }
             }
             
-            if (isxdigit(peek(text))) {
+            if (isxdigit(peek(text, index))) {
                 for (i = 0; i < 2; i++) {
-                    if (isxdigit(peek(text))) {
-                        t.value += consume(text);
+                    if (isxdigit(peek(text, index))) {
+                        t.value += consume(text, index);
                     }
                     else {
                         throwException("Expected a hex digit", line);
@@ -224,17 +217,17 @@ Token grabToken(string* text, int line) {
         }
         else if (c == '_' || isalpha(c)) {
             if (c == 'm') {
-                if (isxdigit(peek(text))) {
-                    t.value += consume(text);
-                    if (isxdigit(peek(text))) {
-                        t.value += consume(text);
+                if (isxdigit(peek(text, index))) {
+                    t.value += consume(text, index);
+                    if (isxdigit(peek(text, index))) {
+                        t.value += consume(text, index);
                         t.type = MEMORY;
                     }
                 }
             }
             else if (c == 'r') {
-                if (isxdigit(peek(text))) {
-                    t.value += consume(text);
+                if (isxdigit(peek(text, index))) {
+                    t.value += consume(text, index);
                     t.type = REGISTER;
                 }
             }
@@ -242,11 +235,11 @@ Token grabToken(string* text, int line) {
             if (t.type == UNKNOWN) {
                 t.type = LABEL;
 
-                while (isAlpha(peek(text))) {
-                    t.value += consume(text);
+                while (isAlpha(peek(text, index))) {
+                    t.value += consume(text, index);
                 }
 
-                tryConsume(text, ":");
+                tryConsume(text, index, ":");
             }
         }
         else {
@@ -259,144 +252,4 @@ Token grabToken(string* text, int line) {
     }
 
     return t;
-}
-
-vector<Token> lex(string text) {
-    vector<Token> tokens;
-
-    while (true) {
-        Token nextToken = grabToken(&text, -1);
-        
-        if (nextToken.type != END) {
-            tokens.push_back(nextToken);
-        }
-
-        if (nextToken.type == END) {
-            break;
-        }
-    }
-
-    return tokens;
-}
-
-void printLineNum(int n) {
-    if (n < 10) {
-        cout << "00";
-    }
-    else if (n < 100) {
-        cout << "0";
-    }
-    cout << n << ": ";
-}
-
-void prettyLex(string text, bool use_full) {
-    vector<Token> tokens = lex(text);
-
-    int token_count = (int) tokens.size();
-
-    int j = 1;
-    printLineNum(j);
-
-    for (int i = 0; i < token_count; i++) {
-        if (tokens[i].type == NEWLINE) {
-            if (i + 1 < token_count) {
-                j++;
-                cout << endl;
-                printLineNum(j);
-            }
-        }
-        else if (!use_full) {
-            cout << TokenTypeDescriptors[tokens[i].type] << " ";
-        }
-        else {
-            cout << TokenTypeDescriptorsFull[tokens[i].type] << " ";
-        }
-    }
-    cout << endl;
-}
-
-void prettyLex(string text, int mode, bool use_full) {
-    if (mode == 0) {
-        prettyLex(text, use_full);
-        return;
-    }
-    if (mode >= 1) {
-        vector<Token> tokens = lex(text);
-
-        int token_count = (int) tokens.size();
-
-        int j = 1;
-
-        for (int i = 0; i < token_count; i++) {
-            if (tokens[i].type == NEWLINE && mode == 1) {
-                if (i + 1 < token_count) {
-                    j++;
-                    cout << endl;
-                }
-            }
-            else if (!use_full) {
-                cout << TokenTypeDescriptors[tokens[i].type] << " ";
-            }
-            else {
-                cout << TokenTypeDescriptorsFull[tokens[i].type] << " ";
-            }
-        }
-        cout << endl;
-    }
-}
-
-void prettyLex(string text, int mode) {
-    prettyLex(text, mode, false);
-}
-
-void testFullLex(bool use_full) {
-    prettyLex(".data", 2, use_full);
-    prettyLex(".define", 2, use_full);
-    prettyLex("// Hello, world", 2, use_full);
-    prettyLex("label_this_could_be_anything:", 2, use_full);
-
-    cout << endl;
-
-    prettyLex("rF", 2, use_full);
-    prettyLex("m0F", 2, use_full);
-    prettyLex("#1", 2, use_full);
-    prettyLex("0x00FF", 2, use_full);
-    prettyLex("\"Hello, world\"", 2, use_full);
-
-    cout << endl;
-
-    prettyLex("add", 2, use_full);
-    prettyLex("sub", 2, use_full);
-    prettyLex("and", 2, use_full);
-    prettyLex("xor", 2, use_full);
-    prettyLex("lsl", 2, use_full);
-    prettyLex("lsr", 2, use_full);
-
-    cout << endl;
-
-    prettyLex("mov", 2, use_full);
-    prettyLex("ldr", 2, use_full);
-    prettyLex("str", 2, use_full);
-
-    cout << endl;
-
-    prettyLex("b", 2, use_full);
-    prettyLex("bz", 2, use_full);
-    prettyLex("bp", 2, use_full);
-    prettyLex("br", 2, use_full);
-    prettyLex("bl", 2, use_full);
-
-    cout << endl;
-
-    prettyLex("stdin", 2, use_full);
-    prettyLex("stdout", 2, use_full);
-
-    cout << endl;
-
-    prettyLex("\n", 2, use_full);
-    prettyLex(";", 2, use_full);
-    prettyLex(",", 2, use_full);
-    prettyLex("{", 2, use_full);
-    prettyLex("}", 2, use_full);
-    prettyLex(" \t   \t    \t\t ", 2, use_full);
 }
