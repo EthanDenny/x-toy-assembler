@@ -9,7 +9,8 @@
 
 using namespace std;
 
-int memory = 16;
+string memory[256];
+int mem_ptr = 0x10;
 int line;
 int code_index = 0;
 
@@ -17,13 +18,29 @@ string convertToHex(int num) {
     stringstream ss;
     ss << hex << num;
     string imm = ss.str();
+    for (auto &c: imm) c = (char) toupper(c); // Convert to uppercase
     if (imm.length() == 1) imm = "0" + imm;
     return imm;
 }
 
 void writeMemory(string statement) {
-    cout << convertToHex(memory) << ": " + statement << endl;
-    memory++;
+    memory[mem_ptr] = statement;
+    mem_ptr++;
+}
+
+void printMemory() {
+    bool has_printed_const = false;
+    for (int i = 0; i < 256; i++) {
+        if (i == 0x10 && has_printed_const) {
+            cout << endl;
+        }
+        if (memory[i] != "") {
+            if (i < 0x10) {
+                has_printed_const = true;
+            }
+            cout << convertToHex(i) << ": " << memory[i] << endl;
+        }
+    }
 }
 
 string tryGrabToken(string* text, token_type type, bool throw_exception) {
@@ -206,4 +223,6 @@ void parse(string* text) {
             // Throw an error: Unexpected token
         }
     }
+
+    printMemory();
 }
