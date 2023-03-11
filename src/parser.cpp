@@ -59,12 +59,19 @@ void printMemory() {
     }
 }
 
-string tryGrabToken(string* text, token_type type, bool throw_exception) {
+bool isNextToken(string* text, token_type type) {
+    int old_index = code_index;
+    Token t = grabToken(text, &code_index, line);
+    code_index = old_index;
+    return t.type == type;
+}
+
+string tryGrabToken(string* text, token_type type) {
     Token t;
 
     if (type == TERMINATOR) {
-        tryGrabToken(text, WHITESPACE, false);
-        tryGrabToken(text, COMMENT, false);
+        if (isNextToken(text, WHITESPACE)) tryGrabToken(text, WHITESPACE);
+        if (isNextToken(text, COMMENT)) tryGrabToken(text, COMMENT);
 
         t = grabToken(text, &code_index, line);
 
@@ -77,25 +84,14 @@ string tryGrabToken(string* text, token_type type, bool throw_exception) {
         }
     }
     else {
-        int prev_code_index = code_index;
         t = grabToken(text, &code_index, line);
 
         if (t.type != type) {
-            if (throw_exception) {
-                throwException("Expected " + TokenTypeDescriptorsFull[type] + " got " + TokenTypeDescriptorsFull[t.type], line);
-            }
-            else {
-                code_index = prev_code_index;
-                return "~";
-            }
+            throwException("Expected " + TokenTypeDescriptorsFull[type] + " got " + TokenTypeDescriptorsFull[t.type], line);
         }
     }
 
     return t.value;
-}
-
-string tryGrabToken(string* text, token_type type) {
-    return tryGrabToken(text, type, true);
 }
 
 void ALStatement(string* text, string opcode) {
@@ -109,16 +105,16 @@ void ALStatement(string* text, string opcode) {
     tryGrabToken(text, WHITESPACE);
     b = tryGrabToken(text, REGISTER);
 
-    string v = tryGrabToken(text, COMMA, false);
-    if (v == "~") { // The next token was NOT a comma
-        tryGrabToken(text, TERMINATOR);
-        writeMemory(opcode + a + a + b);
-    }
-    else {
+    if (isNextToken(text, COMMA)) {
+        tryGrabToken(text, COMMA);
         tryGrabToken(text, WHITESPACE);
         c = tryGrabToken(text, REGISTER);
         tryGrabToken(text, TERMINATOR);
         writeMemory(opcode + a + b + c);
+    }
+    else {
+        tryGrabToken(text, TERMINATOR);
+        writeMemory(opcode + a + a + b);
     }
 }
 
@@ -221,21 +217,19 @@ void parse(string* text) {
             mem = tryGrabToken(text, MEMORY);
             tryGrabToken(text, COMMA);
             tryGrabToken(text, WHITESPACE);
-
-            string hex = tryGrabToken(text, HEX, false);
-            if (hex == "~") { // The next token was NOT a hex value
-                string str = tryGrabToken(text, STRING, false);
-                if (str == "~") { // The next token was NOT a string value
-                    throwException("Expected HEX or STRING", line);
-                }
-                else {
-                    tryGrabToken(text, TERMINATOR);
-                    writeString(mem, str);
-                }
-            }
-            else {
+            
+            if (isNextToken(text, HEX)) {
+                string hex = tryGrabToken(text, HEX);
                 tryGrabToken(text, TERMINATOR);
                 writeHex(mem, hex);
+            }
+            else if (isNextToken(text, STRING)) {
+                string str = tryGrabToken(text, STRING);
+                tryGrabToken(text, TERMINATOR);
+                writeString(mem, str);
+            }
+            else {
+                throwException("Expected HEX or STRING", line);
             }
 
             // Array version of .data still needs to be added
@@ -279,37 +273,37 @@ void parse(string* text) {
         }
         else if (t.type == MOV) {
             string dest;
-            string src;
-            string imm;
-            string hex;
             
             tryGrabToken(text, WHITESPACE);
             dest = tryGrabToken(text, REGISTER);
             tryGrabToken(text, COMMA);
             tryGrabToken(text, WHITESPACE);
 
-            src = tryGrabToken(text, REGISTER, false);
-            if (src != "~") { // The next token WAS a register
+            if (isNextToken(text, REGISTER)) {
+                string reg = tryGrabToken(text, REGISTER);
                 tryGrabToken(text, TERMINATOR);
-                writeMemory("1" + dest + src + "0");
+                
+                writeMemory("1" + dest + reg + "0");
+            }
+            else if (isNextToken(text, IMMEDIATE)) {
+                string imm = tryGrabToken(text, IMMEDIATE);
+                tryGrabToken(text, TERMINATOR);
+                
+                imm = convertToHex(stoi(imm));
+                writeMemory("7" + dest + imm);
+            }
+            else if (isNextToken(text, HEX)) {
+                string hex = tryGrabToken(text, HEX);
+                if (hex[0] != '0' || hex[1] != '0') {
+                    throwException("Hex value too large for MOV", line);
+                }
+
+                tryGrabToken(text, TERMINATOR);
+
+                writeMemory("7" + dest + hex[2] + hex[3]);
             }
             else {
-                imm = tryGrabToken(text, IMMEDIATE, false);
-                if (imm != "~") { // The next token WAS a decimal value
-                    tryGrabToken(text, TERMINATOR);
-                    imm = convertToHex(stoi(imm));
-                    writeMemory("7" + dest + imm);
-                }
-                else {
-                    hex = tryGrabToken(text, HEX, false);
-                    if (hex != "~") { // The next token WAS a hex value
-                        tryGrabToken(text, TERMINATOR);
-                        if (hex[0] != '0' || hex[1] != '0') {
-                            throwException("Hex value too large for MOV", line);
-                        }
-                        writeMemory("7" + dest + hex[2] + hex[3]);
-                    }
-                }
+                throwException("Expected REGISTER, IMMEDIATE, or HEX", line);
             }
         }
         else if (t.type == LDR) {
