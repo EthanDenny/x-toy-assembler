@@ -14,6 +14,14 @@ int global_ptr = 0x10;
 int line;
 int code_index = 0;
 
+typedef struct label_hook {
+    string label;
+    int ptr;
+}  LabelHook;
+
+vector<LabelHook> hook_put;
+vector<LabelHook> hook_get;
+
 string convertToHex(int num) {
     stringstream ss;
     ss << hex << num;
@@ -138,6 +146,41 @@ void regMemStatement(string* text, string opcode) {
     writeMemory(opcode + reg + mem);
 }
 
+void branchStatement(string* text, string opcode, string reg) {
+    string label;
+    string addr;
+
+    tryGrabToken(text, WHITESPACE);
+    label = tryGrabToken(text, LABEL);
+    tryGrabToken(text, TERMINATOR);
+    
+    for(LabelHook hook : hook_get) {
+        if (hook.label == label) {
+            addr += convertToHex(hook.ptr);
+        }
+    }
+    
+    if (addr == "") { // Did not find label
+        LabelHook hook;
+        hook.label = label;
+        hook.ptr = global_ptr;
+
+        hook_put.push_back(hook);
+    }
+
+    writeMemory(opcode + reg + addr);
+}
+
+void branchRegStatement(string* text, string opcode) {
+    string reg;
+
+    tryGrabToken(text, WHITESPACE);
+    reg = tryGrabToken(text, REGISTER);
+    tryGrabToken(text, COMMA);
+
+    branchStatement(text, opcode, reg);
+}
+
 void writeHex(string addr, string hex) {
     int ptr = hexToInt(addr);
 
@@ -202,7 +245,19 @@ void parse(string* text) {
             // TL;DR: Do later
         }
         else if (t.type == LABEL) {
-            // This is also complicated to implement
+            tryGrabToken(text, TERMINATOR);
+
+            for(LabelHook hook : hook_put) {
+                if (hook.label == t.value) {
+                    memory[hook.ptr] += convertToHex(global_ptr);
+                }
+            }
+            
+            LabelHook hook;
+            hook.label = t.value;
+            hook.ptr = global_ptr;
+
+            hook_get.push_back(hook);
         }
         else if (t.type == ADD) {
             ALStatement(text, "1");
@@ -249,13 +304,13 @@ void parse(string* text) {
             regMemStatement(text, "9");
         }
         else if (t.type == BRANCH) {
-            // Add functionality
+            branchStatement(text, "C", "0");
         }
         else if (t.type == BRANCH_ZERO) {
-            // Add functionality
+            branchRegStatement(text, "C");
         }
         else if (t.type == BRANCH_POSITIVE) {
-            // Add functionality
+            branchRegStatement(text, "D");
         }
         else if (t.type == BRANCH_REGISTER) {
             singleRegStatement(text, "E", "00");
