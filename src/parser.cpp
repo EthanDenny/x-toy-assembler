@@ -302,7 +302,7 @@ void parse(string* text) {
                 }
                 else {
                     hex = tryGrabToken(text, HEX, false);
-                    if (hex != "~") { // The next token WAS a decimal value
+                    if (hex != "~") { // The next token WAS a hex value
                         tryGrabToken(text, TERMINATOR);
                         if (hex[0] != '0' || hex[1] != '0') {
                             throwException("Hex value too large for MOV", line);
