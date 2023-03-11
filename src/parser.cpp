@@ -22,6 +22,8 @@ typedef struct label_hook {
 vector<LabelHook> hook_put;
 vector<LabelHook> hook_get;
 
+void removeIf(string* text, token_type type);
+
 string convertToHex(int num) {
     stringstream ss;
     ss << hex << num;
@@ -75,8 +77,8 @@ string tryGrabToken(string* text, token_type type) {
     Token t;
 
     if (type == TERMINATOR) {
-        if (isNextToken(text, WHITESPACE)) tryGrabToken(text, WHITESPACE);
-        if (isNextToken(text, COMMENT)) tryGrabToken(text, COMMENT);
+        removeIf(text, WHITESPACE);
+        removeIf(text, COMMENT);
 
         t = grabToken(text, &code_index, line);
 
@@ -97,6 +99,10 @@ string tryGrabToken(string* text, token_type type) {
     }
 
     return t.value;
+}
+
+void removeIf(string* text, token_type type) {
+    if (isNextToken(text, type)) tryGrabToken(text, type);
 }
 
 void ALStatement(string* text, string opcode) {
@@ -219,8 +225,24 @@ void parse(string* text) {
                 tryGrabToken(text, TERMINATOR);
                 writeString(mem, str);
             }
+            else if (isNextToken(text, CURLY_BRACE_LEFT)) {
+                tryGrabToken(text, CURLY_BRACE_LEFT);
+                for (int ptr = hexToInt(mem); ptr < 256; ptr++) {
+                    removeIf(text, WHITESPACE);
+                    string hex = tryGrabToken(text, HEX);
+                    memory[ptr] = hex;
+                    if (isNextToken(text, CURLY_BRACE_RIGHT)) {
+                        tryGrabToken(text, CURLY_BRACE_RIGHT);
+                        tryGrabToken(text, TERMINATOR);
+                        break;
+                    }
+                    else {
+                        tryGrabToken(text, COMMA);
+                    }
+                }
+            }
             else {
-                throwException("Expected HEX or STRING", line);
+                throwException("Expected HEX, STRING, or array of HEX", line);
             }
 
             // Array version of .data still needs to be added
