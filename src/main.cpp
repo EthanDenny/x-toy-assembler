@@ -5,6 +5,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "types.h"
+#include "helpers.h"
 
 using namespace std;
 
@@ -35,11 +36,11 @@ void printMemory() {
             if (i < 0x10) {
                 has_printed_const = true;
             }
-            cout << convertToHex(i) << ": " << memory[i] << endl;
+            cout << decimalToHex(i) << ": " << memory[i] << endl;
 
              // Add halt
             if (i >= 0x10 && memory[i + 1] == "") {
-                cout << convertToHex(i + 1) << ": 0000" << endl;
+                cout << decimalToHex(i + 1) << ": 0000" << endl;
             }
         }
     }
@@ -58,11 +59,11 @@ void storeMemory(string filepath) {
             if (i < 0x10) {
                 has_printed_const = true;
             }
-            file << convertToHex(i) << ": " << memory[i] << endl;
+            file << decimalToHex(i) << ": " << memory[i] << endl;
 
              // Add halt
             if (i >= 0x10 && memory[i + 1] == "") {
-                file << convertToHex(i + 1) << ": 0000" << endl;
+                file << decimalToHex(i + 1) << ": 0000" << endl;
             }
         }
     }

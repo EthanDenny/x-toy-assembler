@@ -6,6 +6,7 @@
 #include "exception.h"
 #include "lexer.h"
 #include "types.h"
+#include "helpers.h"
 
 using namespace std;
 
@@ -26,23 +27,6 @@ void removeIf(string* text, token_type type);
 
 string* getMemory(void) {
     return memory;
-}
-
-string convertToHex(int num) {
-    stringstream ss;
-    ss << hex << num;
-    string imm = ss.str();
-    for (auto &c: imm) c = (char) toupper(c); // Convert to uppercase
-    if (imm.length() == 1) imm = "0" + imm;
-    return imm;
-}
-
-int hexToInt(string hex_str) {
-    int x;
-    stringstream ss;
-    ss << hex << hex_str;
-    ss >> x;
-    return x;
 }
 
 void writeMemory(string statement) {
@@ -133,7 +117,7 @@ void branchStatement(string* text, string opcode, string reg) {
     
     for(LabelHook hook : hook_get) {
         if (hook.label == label) {
-            addr += convertToHex(hook.ptr);
+            addr += decimalToHex(hook.ptr);
         }
     }
     
@@ -159,7 +143,7 @@ void branchRegStatement(string* text, string opcode) {
 }
 
 void writeHex(string addr, string hex) {
-    int ptr = hexToInt(addr);
+    int ptr = hexToDecimal(addr);
 
     if (hex.length() == 2) {
         hex = "00" + hex;
@@ -169,12 +153,12 @@ void writeHex(string addr, string hex) {
 }
 
 void writeString(string addr, string str) {
-    int ptr = hexToInt(addr);
+    int ptr = hexToDecimal(addr);
     int i;
 
     for (i = 0; i < (int) str.length(); i += 2) {
-        string ch = convertToHex(str[i]);
-        string ch2 = convertToHex(str[i+1]);
+        string ch = decimalToHex(str[i]);
+        string ch2 = decimalToHex(str[i+1]);
         memory[ptr] = ch + ch2;
         ptr++;
     }
@@ -211,7 +195,7 @@ void parse(string* text) {
             }
             else if (isNextToken(text, CURLY_BRACE_LEFT)) {
                 tryGrabToken(text, CURLY_BRACE_LEFT);
-                for (int ptr = hexToInt(mem); ptr < 256; ptr++) {
+                for (int ptr = hexToDecimal(mem); ptr < 256; ptr++) {
                     removeIf(text, WHITESPACE);
                     string hex = tryGrabToken(text, HEX);
                     memory[ptr] = hex;
@@ -240,7 +224,7 @@ void parse(string* text) {
 
             for(LabelHook hook : hook_put) {
                 if (hook.label == t.value) {
-                    memory[hook.ptr] += convertToHex(global_ptr);
+                    memory[hook.ptr] += decimalToHex(global_ptr);
                 }
             }
             
@@ -286,7 +270,7 @@ void parse(string* text) {
                 string imm = tryGrabToken(text, IMMEDIATE);
                 tryGrabToken(text, TERMINATOR);
                 
-                imm = convertToHex(stoi(imm));
+                imm = decimalToHex(stoi(imm));
                 writeMemory("7" + dest + imm);
             }
             else if (isNextToken(text, HEX)) {
