@@ -24,6 +24,10 @@ vector<LabelHook> hook_get;
 
 void removeIf(string* text, token_type type);
 
+string* getMemory(void) {
+    return memory;
+}
+
 string convertToHex(int num) {
     stringstream ss;
     ss << hex << num;
@@ -44,26 +48,6 @@ int hexToInt(string hex_str) {
 void writeMemory(string statement) {
     memory[global_ptr] = statement;
     global_ptr++;
-}
-
-void printMemory() {
-    bool has_printed_const = false;
-    for (int i = 0; i < 256; i++) {
-        if (i == 0x10 && has_printed_const) {
-            cout << endl;
-        }
-        if (memory[i] != "") {
-            if (i < 0x10) {
-                has_printed_const = true;
-            }
-            cout << convertToHex(i) << ": " << memory[i] << endl;
-
-             // Add halt
-            if (i >= 0x10 && memory[i + 1] == "") {
-                cout << convertToHex(i + 1) << ": 0000" << endl;
-            }
-        }
-    }
 }
 
 bool isNextToken(string* text, token_type type) {
@@ -398,6 +382,4 @@ void parse(string* text) {
             // Throw an error: Unexpected token
         }
     }
-
-    printMemory();
 }

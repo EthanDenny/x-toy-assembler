@@ -8,8 +8,8 @@
 
 using namespace std;
 
-string readFile(string filename) {
-    ifstream file(filename);
+string readFile(string filepath) {
+    ifstream file(filepath);
 
     string content;
     char ch;
@@ -23,9 +23,62 @@ string readFile(string filename) {
     return content;
 }
 
-int main(int argc, char** argv) {
-    string filename = argv[1];
-    string assembly_code = readFile(filename);
+void printMemory() {
+    string* memory = getMemory();
 
+    bool has_printed_const = false;
+    for (int i = 0; i < 256; i++) {
+        if (i == 0x10 && has_printed_const) {
+            cout << endl;
+        }
+        if (memory[i] != "") {
+            if (i < 0x10) {
+                has_printed_const = true;
+            }
+            cout << convertToHex(i) << ": " << memory[i] << endl;
+
+             // Add halt
+            if (i >= 0x10 && memory[i + 1] == "") {
+                cout << convertToHex(i + 1) << ": 0000" << endl;
+            }
+        }
+    }
+}
+
+void storeMemory(string filepath) {
+    string* memory = getMemory();
+    ofstream file(filepath);
+
+    bool has_printed_const = false;
+    for (int i = 0; i < 256; i++) {
+        if (i == 0x10 && has_printed_const) {
+            file << endl;
+        }
+        if (memory[i] != "") {
+            if (i < 0x10) {
+                has_printed_const = true;
+            }
+            file << convertToHex(i) << ": " << memory[i] << endl;
+
+             // Add halt
+            if (i >= 0x10 && memory[i + 1] == "") {
+                file << convertToHex(i + 1) << ": 0000" << endl;
+            }
+        }
+    }
+
+    file.close();
+}
+
+int main(int argc, char** argv) {
+    string input_file = argv[1];
+    string assembly_code = readFile(input_file);
     parse(&assembly_code);
+
+    if (argc == 2) {
+        printMemory();
+    }
+    else {
+        storeMemory(argv[2]);
+    }
 }

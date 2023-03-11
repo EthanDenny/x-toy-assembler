@@ -4,5 +4,7 @@
 #include <string>
 
 void parse(std::string* text);
+std::string* getMemory(void);
+std::string convertToHex(int num);
 
 #endif
