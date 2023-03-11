@@ -140,14 +140,11 @@ Token grabToken(string* text, int* index, int line) {
                 }
 
                 if (escape) {
-                    if (C == '0') {
-                        t.value += '\0';
-                    }
-                    else if (C == 'n') {
+                    if (C == 'n') {
                         t.value += '\n';
                     }
                 }
-                else {
+                else if (C != '"') {
                     t.value += C;
                 }
 
