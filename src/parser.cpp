@@ -55,8 +55,14 @@ void printMemory() {
                 has_printed_const = true;
             }
             cout << convertToHex(i) << ": " << memory[i] << endl;
+
+             // Add halt
+            if (i >= 0x10 && memory[i + 1] == "") {
+                cout << convertToHex(i + 1) << ": 0000" << endl;
+            }
         }
     }
+    cout << endl;
 }
 
 bool isNextToken(string* text, token_type type) {
