@@ -40,6 +40,5 @@
 # Build folder
 /build
 
-# ASSEMBLYTOY and TOY files
-*.atoy
-*.toy
+# WIP folder
+/wip
