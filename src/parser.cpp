@@ -62,7 +62,6 @@ void printMemory() {
             }
         }
     }
-    cout << endl;
 }
 
 bool isNextToken(string* text, token_type type) {
