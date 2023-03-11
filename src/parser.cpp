@@ -10,7 +10,7 @@
 using namespace std;
 
 string memory[256];
-int mem_ptr = 0x10;
+int global_ptr = 0x10;
 int line;
 int code_index = 0;
 
@@ -23,9 +23,17 @@ string convertToHex(int num) {
     return imm;
 }
 
+int hexToInt(string hex_str) {
+    int x;
+    stringstream ss;
+    ss << hex << hex_str;
+    ss >> x;
+    return x;
+}
+
 void writeMemory(string statement) {
-    memory[mem_ptr] = statement;
-    mem_ptr++;
+    memory[global_ptr] = statement;
+    global_ptr++;
 }
 
 void printMemory() {
@@ -130,6 +138,31 @@ void regMemStatement(string* text, string opcode) {
     writeMemory(opcode + reg + mem);
 }
 
+void writeHex(string addr, string hex) {
+    int ptr = hexToInt(addr);
+
+    if (hex.length() == 2) {
+        hex = "00" + hex;
+    }
+    
+    memory[ptr] = hex;
+}
+
+void writeString(string addr, string str) {
+    int ptr = hexToInt(addr);
+    int i;
+
+    for (i = 0; i < (int) str.length(); i += 2) {
+        string ch = convertToHex(str[i]);
+        string ch2 = convertToHex(str[i+1]);
+        memory[ptr] = ch + ch2;
+        ptr++;
+    }
+
+    if (i == (int) str.length()) {
+        memory[ptr] = "0000";
+    }
+}
 
 void parse(string* text) {
     Token t;
@@ -139,7 +172,30 @@ void parse(string* text) {
         t = grabToken(text, &code_index, line);
 
         if (t.type == DATA) {
-            // This is complicated to implement
+            string mem;
+            
+            tryGrabToken(text, WHITESPACE);
+            mem = tryGrabToken(text, MEMORY);
+            tryGrabToken(text, COMMA);
+            tryGrabToken(text, WHITESPACE);
+
+            string hex = tryGrabToken(text, HEX, false);
+            if (hex == "~") { // The next token was NOT a hex value
+                string str = tryGrabToken(text, STRING, false);
+                if (str == "~") { // The next token was NOT a string value
+                    throwException("Expected HEX or STRING", line);
+                }
+                else {
+                    tryGrabToken(text, TERMINATOR);
+                    writeString(mem, str);
+                }
+            }
+            else {
+                tryGrabToken(text, TERMINATOR);
+                writeHex(mem, hex);
+            }
+
+            // Array version of .data still needs to be added
         }
         else if (t.type == DEFINE) {
             // This is complicated to implement, and unnecessary right now
