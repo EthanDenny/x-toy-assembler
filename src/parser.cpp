@@ -339,13 +339,10 @@ void parse(string* text) {
         else if (t.type == STDOUT) {
             singleRegStatement(text, "9", "FF");
         }
-        else if (t.type == COMMENT || t.type == WHITESPACE) {
-            // Do nothing
-        }
         else if (t.type == NEWLINE) {
             line++;
         }
-        else {
+        else if (t.type != COMMENT && t.type != WHITESPACE) {
             // Throw an error: Unexpected token
         }
     }
