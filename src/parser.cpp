@@ -128,20 +128,6 @@ void singleRegStatement(string* text, string opcode, string addr) {
     writeMemory(opcode + reg + addr);
 }
 
-void regMemStatement(string* text, string opcode) {
-    string reg;
-    string mem;
-
-    tryGrabToken(text, WHITESPACE);
-    reg = tryGrabToken(text, REGISTER);
-    tryGrabToken(text, COMMA);
-    tryGrabToken(text, WHITESPACE);
-    mem = tryGrabToken(text, MEMORY);
-    tryGrabToken(text, TERMINATOR);
-
-    writeMemory(opcode + reg + mem);
-}
-
 void branchStatement(string* text, string opcode, string reg) {
     string label;
     string addr;
@@ -307,10 +293,45 @@ void parse(string* text) {
             }
         }
         else if (t.type == LDR) {
-            regMemStatement(text, "8");
+            tryGrabToken(text, WHITESPACE);
+            string dest = tryGrabToken(text, REGISTER);
+            tryGrabToken(text, COMMA);
+            tryGrabToken(text, WHITESPACE);
+
+            if (isNextToken(text, MEMORY)) { // Direct
+                string src = tryGrabToken(text, MEMORY);
+                tryGrabToken(text, TERMINATOR);
+
+                writeMemory("8" + dest + src);
+            }
+            else if (isNextToken(text, REGISTER)) { // Indirect
+                string src = tryGrabToken(text, REGISTER);
+                tryGrabToken(text, TERMINATOR);
+
+                writeMemory("A" + dest + "0" + src);
+            }
         }
         else if (t.type == STR) {
-            regMemStatement(text, "9");
+            tryGrabToken(text, WHITESPACE);
+
+            if (isNextToken(text, MEMORY)) { // Direct
+                string dest = tryGrabToken(text, MEMORY);
+                tryGrabToken(text, COMMA);
+                tryGrabToken(text, WHITESPACE);
+                string src = tryGrabToken(text, REGISTER);
+                tryGrabToken(text, TERMINATOR);
+
+                writeMemory("9" + dest + src);
+            }
+            else if (isNextToken(text, REGISTER)) { // Indirect
+                string dest = tryGrabToken(text, REGISTER);
+                tryGrabToken(text, COMMA);
+                tryGrabToken(text, WHITESPACE);
+                string src = tryGrabToken(text, REGISTER);
+                tryGrabToken(text, TERMINATOR);
+
+                writeMemory("B" + src + "0" + dest);
+            }
         }
         else if (t.type == BRANCH) {
             branchStatement(text, "C", "0");
@@ -325,7 +346,17 @@ void parse(string* text) {
             singleRegStatement(text, "E", "00");
         }
         else if (t.type == BRANCH_LINK) {
-            regMemStatement(text, "F");
+            string reg;
+            string mem;
+
+            tryGrabToken(text, WHITESPACE);
+            reg = tryGrabToken(text, REGISTER);
+            tryGrabToken(text, COMMA);
+            tryGrabToken(text, WHITESPACE);
+            mem = tryGrabToken(text, MEMORY);
+            tryGrabToken(text, TERMINATOR);
+
+            writeMemory("F" + reg + mem);
         }
         else if (t.type == STDIN) {
             singleRegStatement(text, "8", "FF");
