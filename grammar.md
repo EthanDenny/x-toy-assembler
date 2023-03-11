@@ -17,7 +17,6 @@ Program memory always starts at m10
 - hex : A hexadecimal value, written as '0x&&&&'
 - str : A string of characters surrounded by double quotes. Supports the escape sequences \0 (null character), \n (newline), and \\" (double quote).
 - label : The name of a jump label
-- any : Anything (terminated by whitespace)
 - newline : A newline
 
 # Syntax
@@ -25,7 +24,11 @@ Program memory always starts at m10
 ## ;
 ## \<newline>
 
-Delineates statement evaluation
+Statement terminator
+
+## //
+
+Comment
 
 # Preprocess
 
@@ -45,17 +48,11 @@ Similar to creating a string, but writes each provided hex value consecutively.
 
 Tell the assembler to replace 'statement' with 'macro' anywhere in the code. Neither 'macro' not 'statement' should contain any commas. Whitespace after the comma will be ignored until a non-whitespace character.
 
-### *Syntax*
-
-    any, any
+\<macro> and \<statement> are currently undefined.
 
 ## \<label>:
 
 Creates a reference to the statement's line in code for use in jump instructions
-
-## //\<any>
-
-A comment. Ignored by the assembler
 
 # Arithmetic and Logical
 
@@ -136,11 +133,27 @@ Set the given register to the given value.
 
 ## ldr \<reg>, \<mem>
 
-Copy the given memory into the given register
+Copy the given memory into the given register.
+
+## ldr \<dest>, \<src>
+
+Copy the memory pointed to by 'src' into 'dest'.
+
+*Syntax*
+
+    reg, reg
 
 ## str \<mem>, \<reg>
 
-Copy the given register into the given memory
+Copy the given register into the given memory.
+
+## str \<dest>, \<src>
+
+Copy 'src' into the memory pointed to by 'dest'.
+
+*Syntax*
+
+    reg, reg
 
 # Control
 
@@ -158,11 +171,11 @@ If the value in the given register is greater than 0, goto the given label.
 
 ## br \<reg>
 
-Jump to the address stored in the given register
+Jump to the address stored in the given register.
 
 ## bl \<reg>, \<addr>
 
-Store the PC in the given register and then jump to 'addr'
+Store the PC in the given register and then jump to 'addr'.
 
 *Syntax*
 
@@ -172,11 +185,11 @@ Store the PC in the given register and then jump to 'addr'
 
 ## stdin \<reg>
 
-Set the value of the given register to stdin
+Set the value of the given register to stdin.
 
 ## stdin \<reg>
 
-Write the value of the given register to stdout
+Write the value of the given register to stdout.
 
 # Machine codes
 
@@ -194,8 +207,10 @@ Write the value of the given register to stdout
 - mov d, s -> 1ds0
 - mov r, i -> 7r## (## = i converted to hex)
 - mov r, h -> 7r## (## = h)
-- ldr -> 8rmm
-- str -> 9rmm
+- ldr r, m -> 8rmm
+- ldr r, R -> Ar0R
+- str r, m -> 9rmm
+- str r, R -> BR0r
 
 ## Control
 
