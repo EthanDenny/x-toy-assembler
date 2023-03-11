@@ -1,6 +1,6 @@
 # toy-assembler
 
-A WIP assembler for the [X-TOY machine from Princeton](https://lift.cs.princeton.edu/xtoy/) in C++.
+An assembler for the [X-TOY machine from Princeton](https://lift.cs.princeton.edu/xtoy/) in C++.
 
 [grammar.md](grammar.md) defines the ARM-like assembly language
 
