@@ -35,11 +35,11 @@ Sets the given memory location to the given hex value
 
 ## .data \<mem>, \<str>
 
-Creates a C-like string starting at the given memory location. Does not add a null character (\0) at the end of the string by default, this must be done explicitly.
+Creates a C-like string starting at the given memory location. Automatically adds a null character (\0) at the end of the string.
 
 ## .data \<mem>, {\<hex>[, \<hex>, ..]}
 
-Similar to creating a string, but writes each provided hex value consequtively.
+Similar to creating a string, but writes each provided hex value consecutively.
 
 ## .define \<macro>, \<statement>
 
