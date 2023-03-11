@@ -294,7 +294,22 @@ void parse(string* text) {
                 writeMemory("1" + dest + src + "0");
             }
             else {
-                // Add immediate and hex functionality
+                imm = tryGrabToken(text, IMMEDIATE, false);
+                if (imm != "~") { // The next token WAS a decimal value
+                    tryGrabToken(text, TERMINATOR);
+                    imm = convertToHex(stoi(imm));
+                    writeMemory("7" + dest + imm);
+                }
+                else {
+                    hex = tryGrabToken(text, HEX, false);
+                    if (hex != "~") { // The next token WAS a decimal value
+                        tryGrabToken(text, TERMINATOR);
+                        if (hex[0] != '0' || hex[1] != '0') {
+                            throwException("Hex value too large for MOV", line);
+                        }
+                        writeMemory("7" + dest + hex[2] + hex[3]);
+                    }
+                }
             }
         }
         else if (t.type == LDR) {
