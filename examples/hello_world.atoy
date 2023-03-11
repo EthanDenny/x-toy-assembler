@@ -1,0 +1,26 @@
+.data m00, "Hello, World!"
+
+// r3: char pointer
+// r4: first char
+// r5: second char
+
+main:
+    mov r1, #1   // r1 = 1
+    mov r2, #8   // r2 = 8
+    mov r3, 0x00 // r3 = 0x00
+print:
+    ldr r4, r3   // r4 = *(r3)
+    mov r5, r4   // r5 = r4
+
+    lsr r4, r2   // r4 = r4 >> 8
+    bz r4, done  // if r4 == 0: goto done
+    stdout r4    // print r4
+
+    lsl r5, r2   // r5 = r5 >> 8
+    lsr r5, r2   // r5 = r5 << 8
+    bz r5, done  // if r5 == 0: goto done
+    stdout r5    // print r5
+
+    add r3, r1   // r3++
+    b print      // goto print
+done:
