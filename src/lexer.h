@@ -4,6 +4,6 @@
 #include <string>
 #include "token.h"
 
-Token grabToken(std::string* text, int* index, int line);
+Token getNextToken(std::string* text, int* index, int line);
 
 #endif

@@ -36,19 +36,19 @@ void writeMemory(string statement) {
 
 bool isNextToken(string* text, TokenType type) {
     int old_index = code_index;
-    Token t = grabToken(text, &code_index, line);
+    Token t = getNextToken(text, &code_index, line);
     code_index = old_index;
     return t.type == type;
 }
 
-string tryGrabToken(string* text, TokenType type) {
+string tryGetToken(string* text, TokenType type) {
     Token t;
 
     if (type == TERMINATOR) {
         removeIf(text, WHITESPACE);
         removeIf(text, COMMENT);
 
-        t = grabToken(text, &code_index, line);
+        t = getNextToken(text, &code_index, line);
 
         if (t.type == NEWLINE) {
             line++;
@@ -59,7 +59,7 @@ string tryGrabToken(string* text, TokenType type) {
         }
     }
     else {
-        t = grabToken(text, &code_index, line);
+        t = getNextToken(text, &code_index, line);
 
         if (t.type != type) {
             throwException("Expected " + TokenTypeDescriptors[type] + " got " + TokenTypeDescriptors[t.type], line);
@@ -70,7 +70,7 @@ string tryGrabToken(string* text, TokenType type) {
 }
 
 void removeIf(string* text, TokenType type) {
-    if (isNextToken(text, type)) tryGrabToken(text, type);
+    if (isNextToken(text, type)) tryGetToken(text, type);
 }
 
 void ALStatement(string* text, string opcode) {
@@ -78,21 +78,21 @@ void ALStatement(string* text, string opcode) {
     string b;
     string c;
     
-    tryGrabToken(text, WHITESPACE);
-    a = tryGrabToken(text, REGISTER);
-    tryGrabToken(text, COMMA);
-    tryGrabToken(text, WHITESPACE);
-    b = tryGrabToken(text, REGISTER);
+    tryGetToken(text, WHITESPACE);
+    a = tryGetToken(text, REGISTER);
+    tryGetToken(text, COMMA);
+    tryGetToken(text, WHITESPACE);
+    b = tryGetToken(text, REGISTER);
 
     if (isNextToken(text, COMMA)) {
-        tryGrabToken(text, COMMA);
-        tryGrabToken(text, WHITESPACE);
-        c = tryGrabToken(text, REGISTER);
-        tryGrabToken(text, TERMINATOR);
+        tryGetToken(text, COMMA);
+        tryGetToken(text, WHITESPACE);
+        c = tryGetToken(text, REGISTER);
+        tryGetToken(text, TERMINATOR);
         writeMemory(opcode + a + b + c);
     }
     else {
-        tryGrabToken(text, TERMINATOR);
+        tryGetToken(text, TERMINATOR);
         writeMemory(opcode + a + a + b);
     }
 }
@@ -100,9 +100,9 @@ void ALStatement(string* text, string opcode) {
 void singleRegStatement(string* text, string opcode, string addr) {
     string reg;
 
-    tryGrabToken(text, WHITESPACE);
-    reg = tryGrabToken(text, REGISTER);
-    tryGrabToken(text, TERMINATOR);
+    tryGetToken(text, WHITESPACE);
+    reg = tryGetToken(text, REGISTER);
+    tryGetToken(text, TERMINATOR);
 
     writeMemory(opcode + reg + addr);
 }
@@ -111,9 +111,9 @@ void branchStatement(string* text, string opcode, string reg) {
     string label;
     string addr;
 
-    tryGrabToken(text, WHITESPACE);
-    label = tryGrabToken(text, LABEL);
-    tryGrabToken(text, TERMINATOR);
+    tryGetToken(text, WHITESPACE);
+    label = tryGetToken(text, LABEL);
+    tryGetToken(text, TERMINATOR);
     
     for(LabelHook hook : hook_get) {
         if (hook.label == label) {
@@ -135,9 +135,9 @@ void branchStatement(string* text, string opcode, string reg) {
 void branchRegStatement(string* text, string opcode) {
     string reg;
 
-    tryGrabToken(text, WHITESPACE);
-    reg = tryGrabToken(text, REGISTER);
-    tryGrabToken(text, COMMA);
+    tryGetToken(text, WHITESPACE);
+    reg = tryGetToken(text, REGISTER);
+    tryGetToken(text, COMMA);
 
     branchStatement(text, opcode, reg);
 }
@@ -173,39 +173,39 @@ void parse(string* text) {
     line = 1;
 
     while (t.type != END) {
-        t = grabToken(text, &code_index, line);
+        t = getNextToken(text, &code_index, line);
 
         if (t.type == DATA) {
             string mem;
             
-            tryGrabToken(text, WHITESPACE);
-            mem = tryGrabToken(text, MEMORY);
-            tryGrabToken(text, COMMA);
-            tryGrabToken(text, WHITESPACE);
+            tryGetToken(text, WHITESPACE);
+            mem = tryGetToken(text, MEMORY);
+            tryGetToken(text, COMMA);
+            tryGetToken(text, WHITESPACE);
             
             if (isNextToken(text, HEX)) {
-                string hex = tryGrabToken(text, HEX);
-                tryGrabToken(text, TERMINATOR);
+                string hex = tryGetToken(text, HEX);
+                tryGetToken(text, TERMINATOR);
                 writeHex(mem, hex);
             }
             else if (isNextToken(text, STRING)) {
-                string str = tryGrabToken(text, STRING);
-                tryGrabToken(text, TERMINATOR);
+                string str = tryGetToken(text, STRING);
+                tryGetToken(text, TERMINATOR);
                 writeString(mem, str);
             }
             else if (isNextToken(text, CURLY_BRACE_LEFT)) {
-                tryGrabToken(text, CURLY_BRACE_LEFT);
+                tryGetToken(text, CURLY_BRACE_LEFT);
                 for (int ptr = hexToDecimal(mem); ptr < 256; ptr++) {
                     removeIf(text, WHITESPACE);
-                    string hex = tryGrabToken(text, HEX);
+                    string hex = tryGetToken(text, HEX);
                     memory[ptr] = hex;
                     if (isNextToken(text, CURLY_BRACE_RIGHT)) {
-                        tryGrabToken(text, CURLY_BRACE_RIGHT);
-                        tryGrabToken(text, TERMINATOR);
+                        tryGetToken(text, CURLY_BRACE_RIGHT);
+                        tryGetToken(text, TERMINATOR);
                         break;
                     }
                     else {
-                        tryGrabToken(text, COMMA);
+                        tryGetToken(text, COMMA);
                     }
                 }
             }
@@ -220,7 +220,7 @@ void parse(string* text) {
             // TL;DR: Do later
         }
         else if (t.type == LABEL) {
-            tryGrabToken(text, TERMINATOR);
+            tryGetToken(text, TERMINATOR);
 
             for(LabelHook hook : hook_put) {
                 if (hook.label == t.value) {
@@ -255,31 +255,31 @@ void parse(string* text) {
         else if (t.type == MOV) {
             string dest;
             
-            tryGrabToken(text, WHITESPACE);
-            dest = tryGrabToken(text, REGISTER);
-            tryGrabToken(text, COMMA);
-            tryGrabToken(text, WHITESPACE);
+            tryGetToken(text, WHITESPACE);
+            dest = tryGetToken(text, REGISTER);
+            tryGetToken(text, COMMA);
+            tryGetToken(text, WHITESPACE);
 
             if (isNextToken(text, REGISTER)) {
-                string reg = tryGrabToken(text, REGISTER);
-                tryGrabToken(text, TERMINATOR);
+                string reg = tryGetToken(text, REGISTER);
+                tryGetToken(text, TERMINATOR);
                 
                 writeMemory("1" + dest + reg + "0");
             }
             else if (isNextToken(text, IMMEDIATE)) {
-                string imm = tryGrabToken(text, IMMEDIATE);
-                tryGrabToken(text, TERMINATOR);
+                string imm = tryGetToken(text, IMMEDIATE);
+                tryGetToken(text, TERMINATOR);
                 
                 imm = decimalToHex(stoi(imm));
                 writeMemory("7" + dest + imm);
             }
             else if (isNextToken(text, HEX)) {
-                string hex = tryGrabToken(text, HEX);
+                string hex = tryGetToken(text, HEX);
                 if (hex[0] != '0' || hex[1] != '0') {
                     throwException("Hex value too large for MOV", line);
                 }
 
-                tryGrabToken(text, TERMINATOR);
+                tryGetToken(text, TERMINATOR);
 
                 writeMemory("7" + dest + hex[2] + hex[3]);
             }
@@ -288,42 +288,42 @@ void parse(string* text) {
             }
         }
         else if (t.type == LDR) {
-            tryGrabToken(text, WHITESPACE);
-            string dest = tryGrabToken(text, REGISTER);
-            tryGrabToken(text, COMMA);
-            tryGrabToken(text, WHITESPACE);
+            tryGetToken(text, WHITESPACE);
+            string dest = tryGetToken(text, REGISTER);
+            tryGetToken(text, COMMA);
+            tryGetToken(text, WHITESPACE);
 
             if (isNextToken(text, MEMORY)) { // Direct
-                string src = tryGrabToken(text, MEMORY);
-                tryGrabToken(text, TERMINATOR);
+                string src = tryGetToken(text, MEMORY);
+                tryGetToken(text, TERMINATOR);
 
                 writeMemory("8" + dest + src);
             }
             else if (isNextToken(text, REGISTER)) { // Indirect
-                string src = tryGrabToken(text, REGISTER);
-                tryGrabToken(text, TERMINATOR);
+                string src = tryGetToken(text, REGISTER);
+                tryGetToken(text, TERMINATOR);
 
                 writeMemory("A" + dest + "0" + src);
             }
         }
         else if (t.type == STR) {
-            tryGrabToken(text, WHITESPACE);
+            tryGetToken(text, WHITESPACE);
 
             if (isNextToken(text, MEMORY)) { // Direct
-                string dest = tryGrabToken(text, MEMORY);
-                tryGrabToken(text, COMMA);
-                tryGrabToken(text, WHITESPACE);
-                string src = tryGrabToken(text, REGISTER);
-                tryGrabToken(text, TERMINATOR);
+                string dest = tryGetToken(text, MEMORY);
+                tryGetToken(text, COMMA);
+                tryGetToken(text, WHITESPACE);
+                string src = tryGetToken(text, REGISTER);
+                tryGetToken(text, TERMINATOR);
 
                 writeMemory("9" + dest + src);
             }
             else if (isNextToken(text, REGISTER)) { // Indirect
-                string dest = tryGrabToken(text, REGISTER);
-                tryGrabToken(text, COMMA);
-                tryGrabToken(text, WHITESPACE);
-                string src = tryGrabToken(text, REGISTER);
-                tryGrabToken(text, TERMINATOR);
+                string dest = tryGetToken(text, REGISTER);
+                tryGetToken(text, COMMA);
+                tryGetToken(text, WHITESPACE);
+                string src = tryGetToken(text, REGISTER);
+                tryGetToken(text, TERMINATOR);
 
                 writeMemory("B" + src + "0" + dest);
             }
@@ -344,12 +344,12 @@ void parse(string* text) {
             string reg;
             string mem;
 
-            tryGrabToken(text, WHITESPACE);
-            reg = tryGrabToken(text, REGISTER);
-            tryGrabToken(text, COMMA);
-            tryGrabToken(text, WHITESPACE);
-            mem = tryGrabToken(text, MEMORY);
-            tryGrabToken(text, TERMINATOR);
+            tryGetToken(text, WHITESPACE);
+            reg = tryGetToken(text, REGISTER);
+            tryGetToken(text, COMMA);
+            tryGetToken(text, WHITESPACE);
+            mem = tryGetToken(text, MEMORY);
+            tryGetToken(text, TERMINATOR);
 
             writeMemory("F" + reg + mem);
         }

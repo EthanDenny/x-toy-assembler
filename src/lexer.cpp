@@ -15,7 +15,7 @@ char consume(string* text, int* index) {
     return ch;
 }
 
-bool tryConsume(string* text, int* index, string sub) {
+bool findToken(string* text, int* index, string sub) {
     if ((int) text->find(sub, *index) == *index) {
         *index += sub.length();
         return true;
@@ -25,83 +25,83 @@ bool tryConsume(string* text, int* index, string sub) {
     }
 }
 
-Token grabToken(string* text, int* index, int line) {
+Token getNextToken(string* text, int* index, int line) {
     Token t;
 
     if ((int) text->length() <= *index) {
         t.type = END;
     }
-    else if (tryConsume(text, index, " ") || tryConsume(text, index, "\t")) {
+    else if (findToken(text, index, " ") || findToken(text, index, "\t")) {
         t.type = WHITESPACE;
-        while (tryConsume(text, index, " ") || tryConsume(text, index, "\t")) {}
+        while (findToken(text, index, " ") || findToken(text, index, "\t")) {}
     }
-    else if (tryConsume(text, index, ";")) {
+    else if (findToken(text, index, ";")) {
         t.type = SEMICOLON;
     }
-    else if (tryConsume(text, index, ",")) {
+    else if (findToken(text, index, ",")) {
         t.type = COMMA;
     }
-    else if (tryConsume(text, index, "{")) {
+    else if (findToken(text, index, "{")) {
         t.type = CURLY_BRACE_LEFT;
     }
-    else if (tryConsume(text, index, "}")) {
+    else if (findToken(text, index, "}")) {
         t.type = CURLY_BRACE_RIGHT;
     }
-    else if (tryConsume(text, index, ".data")) {
+    else if (findToken(text, index, ".data")) {
         t.type = DATA;;
     }
-    else if (tryConsume(text, index, ".define")) {
+    else if (findToken(text, index, ".define")) {
         t.type = DEFINE;
     }
-    else if (tryConsume(text, index, "\n")) {
+    else if (findToken(text, index, "\n")) {
         t.type = NEWLINE;
     }
-    else if (tryConsume(text, index, "add")) {
+    else if (findToken(text, index, "add")) {
         t.type = ADD;
     }
-    else if (tryConsume(text, index, "and")) {
+    else if (findToken(text, index, "and")) {
         t.type = AND;
     }
-    else if (tryConsume(text, index, "bz")) {
+    else if (findToken(text, index, "bz")) {
         t.type = BRANCH_ZERO;
     }
-    else if (tryConsume(text, index, "bp")) {
+    else if (findToken(text, index, "bp")) {
         t.type = BRANCH_POSITIVE;
     }
-    else if (tryConsume(text, index, "br")) {
+    else if (findToken(text, index, "br")) {
         t.type = BRANCH_REGISTER;
     }
-    else if (tryConsume(text, index, "bl")) {
+    else if (findToken(text, index, "bl")) {
         t.type = BRANCH_LINK;
     }
-    else if (tryConsume(text, index, "b")) {
+    else if (findToken(text, index, "b")) {
         t.type = BRANCH;
     }
-    else if (tryConsume(text, index, "lsl")) {
+    else if (findToken(text, index, "lsl")) {
         t.type = LSL;
     }
-    else if (tryConsume(text, index, "lsr")) {
+    else if (findToken(text, index, "lsr")) {
         t.type = LSR;
     }
-    else if (tryConsume(text, index, "ldr")) {
+    else if (findToken(text, index, "ldr")) {
         t.type = LDR;
     }
-    else if (tryConsume(text, index, "mov")) {
+    else if (findToken(text, index, "mov")) {
         t.type = MOV;
     }
-    else if (tryConsume(text, index, "sub")) {
+    else if (findToken(text, index, "sub")) {
         t.type = SUB;
     }
-    else if (tryConsume(text, index, "str")) {
+    else if (findToken(text, index, "str")) {
         t.type = STR;
     }
-    else if (tryConsume(text, index, "stdin")) {
+    else if (findToken(text, index, "stdin")) {
         t.type = STDIN;
     }
-    else if (tryConsume(text, index, "stdout")) {
+    else if (findToken(text, index, "stdout")) {
         t.type = STDOUT;
     }
-    else if (tryConsume(text, index, "xor")) {
+    else if (findToken(text, index, "xor")) {
         t.type = XOR;
     }
     else {
@@ -118,7 +118,7 @@ Token grabToken(string* text, int* index, int line) {
             else if (peek(text, index) == '*') {
                 t.type = COMMENT;
                 char C;
-                while (C != EOF && !(C == '*' && tryConsume(text, index, "/"))) {
+                while (C != EOF && !(C == '*' && findToken(text, index, "/"))) {
                     C = consume(text, index);
                 }
             }
@@ -162,7 +162,7 @@ Token grabToken(string* text, int* index, int line) {
                 };
             };
         }
-        else if (c == '0' && tryConsume(text, index, "x")) {
+        else if (c == '0' && findToken(text, index, "x")) {
             t.type = HEX;
 
             int i;
@@ -214,7 +214,7 @@ Token grabToken(string* text, int* index, int line) {
                     t.value += consume(text, index);
                 }
 
-                tryConsume(text, index, ":");
+                findToken(text, index, ":");
             }
         }
         else {
