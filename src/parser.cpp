@@ -212,8 +212,6 @@ void parse(string* text) {
             else {
                 throwException("Expected HEX, STRING, or array of HEX", line);
             }
-
-            // Array version of .data still needs to be added
         }
         else if (t.type == DEFINE) {
             // This is complicated to implement, and unnecessary right now
