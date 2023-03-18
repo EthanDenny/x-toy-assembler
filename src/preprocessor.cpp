@@ -57,8 +57,6 @@ void preprocess(string* text) {
             string findString = findThis.str();
             string replaceString = replaceWith.str();
 
-            cout << findString << ", " << replaceString << endl;
-
             size_t pos = 0;
             while (true) {
                 pos = text->find(findString, pos);

@@ -10,10 +10,9 @@
 
 using namespace std;
 
-string memory[256];
-int global_ptr = 0x10;
 int line;
 int code_index;
+int globalPtr = 0x10;
 
 typedef struct label_hook {
     string label;
@@ -23,16 +22,12 @@ typedef struct label_hook {
 vector<LabelHook> hook_put;
 vector<LabelHook> hook_get;
 
-void skipNextTokenIf(string* text, TokenType type);
-
-string* getMemory(void) {
-    return memory;
-}
-
 void writeMemory(string statement) {
-    memory[global_ptr] = statement;
-    global_ptr++;
+    memory[globalPtr] = statement;
+    globalPtr++;
 }
+
+void skipNextTokenIf(string* text, TokenType type);
 
 bool isNextToken(string* text, TokenType type) {
     int old_index = code_index;
@@ -124,7 +119,7 @@ void writeBranchStatement(string* text, string opcode, string reg) {
     if (addr == "") { // Did not find label
         LabelHook hook;
         hook.label = label;
-        hook.ptr = global_ptr;
+        hook.ptr = globalPtr;
 
         hook_put.push_back(hook);
     }
@@ -219,13 +214,13 @@ void parse(string* text) {
 
             for(LabelHook hook : hook_put) {
                 if (hook.label == t.value) {
-                    memory[hook.ptr] += decimalToHex(global_ptr);
+                    memory[hook.ptr] += decimalToHex(globalPtr);
                 }
             }
             
             LabelHook hook;
             hook.label = t.value;
-            hook.ptr = global_ptr;
+            hook.ptr = globalPtr;
 
             hook_get.push_back(hook);
         }
