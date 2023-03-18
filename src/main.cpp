@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 
 #include "lexer.h"
 #include "parser.h"
@@ -24,51 +25,29 @@ string readFile(string filepath) {
     return content;
 }
 
-void printMemory() {
+string outputMemory() {
     string* memory = getMemory();
+    stringstream ss;
 
     bool has_printed_const = false;
     for (int i = 0; i < 256; i++) {
         if (i == 0x10 && has_printed_const) {
-            cout << endl;
+            ss << endl;
         }
         if (memory[i] != "") {
             if (i < 0x10) {
                 has_printed_const = true;
             }
-            cout << decimalToHex(i) << ": " << memory[i] << endl;
+            ss << decimalToHex(i) << ": " << memory[i] << endl;
 
              // Add halt
             if (i >= 0x10 && memory[i + 1] == "") {
-                cout << decimalToHex(i + 1) << ": 0000" << endl;
-            }
-        }
-    }
-}
-
-void storeMemory(string filepath) {
-    string* memory = getMemory();
-    ofstream file(filepath);
-
-    bool has_printed_const = false;
-    for (int i = 0; i < 256; i++) {
-        if (i == 0x10 && has_printed_const) {
-            file << endl;
-        }
-        if (memory[i] != "") {
-            if (i < 0x10) {
-                has_printed_const = true;
-            }
-            file << decimalToHex(i) << ": " << memory[i] << endl;
-
-             // Add halt
-            if (i >= 0x10 && memory[i + 1] == "") {
-                file << decimalToHex(i + 1) << ": 0000" << endl;
+                ss << decimalToHex(i + 1) << ": 0000" << endl;
             }
         }
     }
 
-    file.close();
+    return ss.str();
 }
 
 int main(int argc, char** argv) {
@@ -77,9 +56,11 @@ int main(int argc, char** argv) {
     parse(&assembly_code);
 
     if (argc == 2) {
-        printMemory();
+        cout << outputMemory();
     }
     else {
-        storeMemory(argv[2]);
+        ofstream file(argv[2]);
+        file << outputMemory();
+        file.close();
     }
 }
