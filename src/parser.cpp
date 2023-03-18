@@ -360,8 +360,8 @@ void parse(string* text) {
         else if (t.type == NEWLINE) {
             line++;
         }
-        else if (t.type != COMMENT && t.type != WHITESPACE) {
-            // Throw an error: Unexpected token
+        else if (t.type != COMMENT && t.type != WHITESPACE && t.type != SEMICOLON) {
+            throwException("Unexpected token " + TokenTypeDescriptors[t.type], line);
         }
     }
 
