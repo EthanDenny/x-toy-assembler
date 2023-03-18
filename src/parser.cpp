@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "exception.h"
-#include "lexer.h"
+#include "tokenizer.h"
 #include "token.h"
 #include "common.h"
 

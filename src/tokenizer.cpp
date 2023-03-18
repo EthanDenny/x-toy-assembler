@@ -219,7 +219,7 @@ Token getNextToken(string* text, int* code_index, int line) {
     }
 
     if (t.type == UNKNOWN) {
-        throwException("Lexer error (unknown token)", line);
+        throwException("Internal error (unknown token)", line);
     }
 
     return t;

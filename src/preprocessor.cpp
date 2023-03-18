@@ -2,7 +2,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "lexer.h"
+#include "tokenizer.h"
 #include "token.h"
 #include "exception.h"
 #include "common.h"

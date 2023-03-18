@@ -1,5 +1,5 @@
-#ifndef LEXER
-#define LEXER
+#ifndef TOKENIZER
+#define TOKENIZER
 
 #include <string>
 #include "token.h"
