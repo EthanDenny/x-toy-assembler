@@ -71,7 +71,9 @@ static std::string TokenTypeDescriptors[] = {
     "LSL",
     "LSR",
 
-    "MOV", "LDR", "STR",
+    "MOV",
+    "LDR",
+    "STR",
 
     "BRANCH",
     "BRANCH_ZERO",
