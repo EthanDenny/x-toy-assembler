@@ -214,10 +214,6 @@ void parse(string* text) {
                 throwException("Expected HEX, STRING, or array of HEX", line);
             }
         }
-        else if (t.type == DEFINE) {
-            // This is complicated to implement, and unnecessary right now
-            // TL;DR: Do later
-        }
         else if (t.type == LABEL) {
             tryGetToken(text, TERMINATOR);
 

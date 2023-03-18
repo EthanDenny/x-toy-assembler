@@ -1,26 +1,26 @@
 .data m00, "Hello, World!"
 
-// r3: char pointer
-// r4: first char
-// r5: second char
+.define char_ptr, r3
+.define first_char, r4
+.define second_char, r5
 
 main:
-    mov r1, #1   // r1 = 1
-    mov r2, #8   // r2 = 8
-    mov r3, 0x00 // r3 = 0x00
+    mov r1, #1                      // r1 = 1
+    mov r2, #8                      // r2 = 8
+    mov char_ptr, 0x00              // char_ptr = 0x00
 print:
-    ldr r4, r3   // r4 = *(r3)
-    mov r5, r4   // r5 = r4
+    ldr first_char, char_ptr        // first_char = *(char_ptr)
+    mov second_char, first_char     // second_char = first_char
 
-    lsr r4, r2   // r4 = r4 >> 8
-    bz r4, done  // if r4 == 0: goto done
-    stdout r4    // print r4
+    lsr first_char, r2              // first_char = first_char >> 8
+    bz first_char, done             // if first_char == 0: goto done
+    stdout first_char               // print first_char
 
-    lsl r5, r2   // r5 = r5 >> 8
-    lsr r5, r2   // r5 = r5 << 8
-    bz r5, done  // if r5 == 0: goto done
-    stdout r5    // print r5
+    lsl second_char, r2             // second_char = second_char >> 8
+    lsr second_char, r2             // second_char = second_char << 8
+    bz second_char, done            // if second_char == 0: goto done
+    stdout second_char              // print second_char
 
-    add r3, r1   // r3++
-    b print      // goto print
+    add char_ptr, r1                // char_ptr++
+    b print                         // goto print
 done:

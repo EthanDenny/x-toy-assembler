@@ -19,3 +19,17 @@ int hexToDecimal(string hex_str) {
     ss >> x;
     return x;
 }
+
+bool isWhitespace(char c) {
+    return c == ' ' || c == '\t';
+}
+
+char peek(string* text, int* code_index) {
+    return (*text)[*code_index];
+}
+
+char consume(string* text, int* code_index) {
+    char ch = peek(text, code_index);
+    *code_index += 1;
+    return ch;
+}

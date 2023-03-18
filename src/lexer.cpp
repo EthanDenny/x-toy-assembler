@@ -2,18 +2,9 @@
 
 #include "exception.h"
 #include "token.h"
+#include "common.h"
 
 using namespace std;
-
-char peek(string* text, int* code_index) {
-    return (*text)[*code_index];
-}
-
-char consume(string* text, int* code_index) {
-    char ch = peek(text, code_index);
-    *code_index += 1;
-    return ch;
-}
 
 bool findNext(string* text, int* code_index, string sub) {
     if ((int) text->find(sub, *code_index) == *code_index) {
@@ -31,9 +22,11 @@ Token getNextToken(string* text, int* code_index, int line) {
     if ((int) text->length() <= *code_index) {
         t.type = END;
     }
-    else if (findNext(text, code_index, " ") || findNext(text, code_index, "\t")) {
+    else if (isWhitespace(peek(text, code_index))) {
         t.type = WHITESPACE;
-        while (findNext(text, code_index, " ") || findNext(text, code_index, "\t")) {}
+        while (isWhitespace(peek(text, code_index))) {
+            consume(text, code_index);
+        }
     }
     else if (findNext(text, code_index, ";")) {
         t.type = SEMICOLON;

@@ -7,6 +7,7 @@
 #include "parser.h"
 #include "token.h"
 #include "common.h"
+#include "preprocessor.h"
 
 using namespace std;
 
@@ -16,6 +17,8 @@ string readFile(string filepath);
 int main(int argc, char** argv) {
     string input_file = argv[1];
     string assembly_code = readFile(input_file);
+
+    preprocess(&assembly_code);
     parse(&assembly_code);
 
     if (argc == 2) {
