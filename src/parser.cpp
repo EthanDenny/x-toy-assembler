@@ -23,7 +23,7 @@ typedef struct label_hook {
 vector<LabelHook> hook_put;
 vector<LabelHook> hook_get;
 
-void removeIf(string* text, TokenType type);
+void removeNextTokenIf(string* text, TokenType type);
 
 string* getMemory(void) {
     return memory;
@@ -45,8 +45,8 @@ string tryGetToken(string* text, TokenType type) {
     Token t;
 
     if (type == TERMINATOR) {
-        removeIf(text, WHITESPACE);
-        removeIf(text, COMMENT);
+        removeNextTokenIf(text, WHITESPACE);
+        removeNextTokenIf(text, COMMENT);
 
         t = getNextToken(text, &code_index, line);
 
@@ -69,11 +69,11 @@ string tryGetToken(string* text, TokenType type) {
     return t.value;
 }
 
-void removeIf(string* text, TokenType type) {
+void removeNextTokenIf(string* text, TokenType type) {
     if (isNextToken(text, type)) tryGetToken(text, type);
 }
 
-void ALStatement(string* text, string opcode) {
+void writeALStatement(string* text, string opcode) {
     string a;
     string b;
     string c;
@@ -97,7 +97,7 @@ void ALStatement(string* text, string opcode) {
     }
 }
 
-void singleRegStatement(string* text, string opcode, string addr) {
+void writeSingleRegStatement(string* text, string opcode, string addr) {
     string reg;
 
     tryGetToken(text, WHITESPACE);
@@ -107,7 +107,7 @@ void singleRegStatement(string* text, string opcode, string addr) {
     writeMemory(opcode + reg + addr);
 }
 
-void branchStatement(string* text, string opcode, string reg) {
+void writeBranchStatement(string* text, string opcode, string reg) {
     string label;
     string addr;
 
@@ -132,14 +132,14 @@ void branchStatement(string* text, string opcode, string reg) {
     writeMemory(opcode + reg + addr);
 }
 
-void branchRegStatement(string* text, string opcode) {
+void writeBranchRegStatement(string* text, string opcode) {
     string reg;
 
     tryGetToken(text, WHITESPACE);
     reg = tryGetToken(text, REGISTER);
     tryGetToken(text, COMMA);
 
-    branchStatement(text, opcode, reg);
+    writeBranchStatement(text, opcode, reg);
 }
 
 void writeHex(string addr, string hex) {
@@ -196,7 +196,7 @@ void parse(string* text) {
             else if (isNextToken(text, CURLY_BRACE_LEFT)) {
                 tryGetToken(text, CURLY_BRACE_LEFT);
                 for (int ptr = hexToDecimal(mem); ptr < 256; ptr++) {
-                    removeIf(text, WHITESPACE);
+                    removeNextTokenIf(text, WHITESPACE);
                     string hex = tryGetToken(text, HEX);
                     memory[ptr] = hex;
                     if (isNextToken(text, CURLY_BRACE_RIGHT)) {
@@ -238,22 +238,22 @@ void parse(string* text) {
             writeMemory("0000");
         }
         else if (t.type == ADD) {
-            ALStatement(text, "1");
+            writeALStatement(text, "1");
         }
         else if (t.type == SUB) {
-            ALStatement(text, "2");
+            writeALStatement(text, "2");
         }
         else if (t.type == AND) {
-            ALStatement(text, "3");
+            writeALStatement(text, "3");
         }
         else if (t.type == XOR) {
-            ALStatement(text, "4");
+            writeALStatement(text, "4");
         }
         else if (t.type == LSL) {
-            ALStatement(text, "5");
+            writeALStatement(text, "5");
         }
         else if (t.type == LSR) {
-            ALStatement(text, "6");
+            writeALStatement(text, "6");
         }
         else if (t.type == MOV) {
             string dest;
@@ -332,16 +332,16 @@ void parse(string* text) {
             }
         }
         else if (t.type == BRANCH) {
-            branchStatement(text, "C", "0");
+            writeBranchStatement(text, "C", "0");
         }
         else if (t.type == BRANCH_ZERO) {
-            branchRegStatement(text, "C");
+            writeBranchRegStatement(text, "C");
         }
         else if (t.type == BRANCH_POSITIVE) {
-            branchRegStatement(text, "D");
+            writeBranchRegStatement(text, "D");
         }
         else if (t.type == BRANCH_REGISTER) {
-            singleRegStatement(text, "E", "00");
+            writeSingleRegStatement(text, "E", "00");
         }
         else if (t.type == BRANCH_LINK) {
             string reg;
@@ -357,10 +357,10 @@ void parse(string* text) {
             writeMemory("F" + reg + mem);
         }
         else if (t.type == STDIN) {
-            singleRegStatement(text, "8", "FF");
+            writeSingleRegStatement(text, "8", "FF");
         }
         else if (t.type == STDOUT) {
-            singleRegStatement(text, "9", "FF");
+            writeSingleRegStatement(text, "9", "FF");
         }
         else if (t.type == NEWLINE) {
             line++;
