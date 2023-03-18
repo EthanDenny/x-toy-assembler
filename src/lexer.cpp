@@ -5,19 +5,19 @@
 
 using namespace std;
 
-char peek(string* text, int* index) {
-    return (*text)[*index];
+char peek(string* text, int* code_index) {
+    return (*text)[*code_index];
 }
 
-char consume(string* text, int* index) {
-    char ch = peek(text, index);
-    *index += 1;
+char consume(string* text, int* code_index) {
+    char ch = peek(text, code_index);
+    *code_index += 1;
     return ch;
 }
 
-bool findNext(string* text, int* index, string sub) {
-    if ((int) text->find(sub, *index) == *index) {
-        *index += sub.length();
+bool findNext(string* text, int* code_index, string sub) {
+    if ((int) text->find(sub, *code_index) == *code_index) {
+        *code_index += sub.length();
         return true;
     }
     else {
@@ -25,104 +25,104 @@ bool findNext(string* text, int* index, string sub) {
     }
 }
 
-Token getNextToken(string* text, int* index, int line) {
+Token getNextToken(string* text, int* code_index, int line) {
     Token t;
 
-    if ((int) text->length() <= *index) {
+    if ((int) text->length() <= *code_index) {
         t.type = END;
     }
-    else if (findNext(text, index, " ") || findNext(text, index, "\t")) {
+    else if (findNext(text, code_index, " ") || findNext(text, code_index, "\t")) {
         t.type = WHITESPACE;
-        while (findNext(text, index, " ") || findNext(text, index, "\t")) {}
+        while (findNext(text, code_index, " ") || findNext(text, code_index, "\t")) {}
     }
-    else if (findNext(text, index, ";")) {
+    else if (findNext(text, code_index, ";")) {
         t.type = SEMICOLON;
     }
-    else if (findNext(text, index, ",")) {
+    else if (findNext(text, code_index, ",")) {
         t.type = COMMA;
     }
-    else if (findNext(text, index, "{")) {
+    else if (findNext(text, code_index, "{")) {
         t.type = CURLY_BRACE_LEFT;
     }
-    else if (findNext(text, index, "}")) {
+    else if (findNext(text, code_index, "}")) {
         t.type = CURLY_BRACE_RIGHT;
     }
-    else if (findNext(text, index, ".data")) {
+    else if (findNext(text, code_index, ".data")) {
         t.type = DATA;;
     }
-    else if (findNext(text, index, ".define")) {
+    else if (findNext(text, code_index, ".define")) {
         t.type = DEFINE;
     }
-    else if (findNext(text, index, "halt")) {
+    else if (findNext(text, code_index, "halt")) {
         t.type = HALT;
     }
-    else if (findNext(text, index, "\n")) {
+    else if (findNext(text, code_index, "\n")) {
         t.type = NEWLINE;
     }
-    else if (findNext(text, index, "add")) {
+    else if (findNext(text, code_index, "add")) {
         t.type = ADD;
     }
-    else if (findNext(text, index, "and")) {
+    else if (findNext(text, code_index, "and")) {
         t.type = AND;
     }
-    else if (findNext(text, index, "bz")) {
+    else if (findNext(text, code_index, "bz")) {
         t.type = BRANCH_ZERO;
     }
-    else if (findNext(text, index, "bp")) {
+    else if (findNext(text, code_index, "bp")) {
         t.type = BRANCH_POSITIVE;
     }
-    else if (findNext(text, index, "br")) {
+    else if (findNext(text, code_index, "br")) {
         t.type = BRANCH_REGISTER;
     }
-    else if (findNext(text, index, "bl")) {
+    else if (findNext(text, code_index, "bl")) {
         t.type = BRANCH_LINK;
     }
-    else if (findNext(text, index, "b")) {
+    else if (findNext(text, code_index, "b")) {
         t.type = BRANCH;
     }
-    else if (findNext(text, index, "lsl")) {
+    else if (findNext(text, code_index, "lsl")) {
         t.type = LSL;
     }
-    else if (findNext(text, index, "lsr")) {
+    else if (findNext(text, code_index, "lsr")) {
         t.type = LSR;
     }
-    else if (findNext(text, index, "ldr")) {
+    else if (findNext(text, code_index, "ldr")) {
         t.type = LDR;
     }
-    else if (findNext(text, index, "mov")) {
+    else if (findNext(text, code_index, "mov")) {
         t.type = MOV;
     }
-    else if (findNext(text, index, "sub")) {
+    else if (findNext(text, code_index, "sub")) {
         t.type = SUB;
     }
-    else if (findNext(text, index, "str")) {
+    else if (findNext(text, code_index, "str")) {
         t.type = STR;
     }
-    else if (findNext(text, index, "stdin")) {
+    else if (findNext(text, code_index, "stdin")) {
         t.type = STDIN;
     }
-    else if (findNext(text, index, "stdout")) {
+    else if (findNext(text, code_index, "stdout")) {
         t.type = STDOUT;
     }
-    else if (findNext(text, index, "xor")) {
+    else if (findNext(text, code_index, "xor")) {
         t.type = XOR;
     }
     else {
-        char c = consume(text, index);
+        char c = consume(text, code_index);
 
         if (c == '/') {
-            if (peek(text, index) == '/') {
+            if (peek(text, code_index) == '/') {
                 t.type = COMMENT;
                 char C = '/';
-                while (peek(text, index) != '\n' && C != EOF) {
-                    C = consume(text, index);
+                while (peek(text, code_index) != '\n' && C != EOF) {
+                    C = consume(text, code_index);
                 }
             }
-            else if (peek(text, index) == '*') {
+            else if (peek(text, code_index) == '*') {
                 t.type = COMMENT;
                 char C;
-                while (C != EOF && !(C == '*' && findNext(text, index, "/"))) {
-                    C = consume(text, index);
+                while (C != EOF && !(C == '*' && findNext(text, code_index, "/"))) {
+                    C = consume(text, code_index);
                 }
             }
             else {
@@ -136,7 +136,7 @@ Token getNextToken(string* text, int* index, int line) {
             bool escape = false;
 
             while (C != '"') {
-                C = consume(text, index);
+                C = consume(text, code_index);
 
                 if (C == '\n' || C == EOF) {
                     throwException("Expected closing quotes", line);
@@ -155,34 +155,34 @@ Token getNextToken(string* text, int* index, int line) {
             }
         }
         else if (c == '#') {
-            if (!isdigit(peek(text, index))) {
+            if (!isdigit(peek(text, code_index))) {
                 throwException("Expected a digit after '#'", line);
             }
             else {
                 t.type = IMMEDIATE;
-                while (isdigit(peek(text, index))) {
-                    t.value += consume(text, index);
+                while (isdigit(peek(text, code_index))) {
+                    t.value += consume(text, code_index);
                 };
             };
         }
-        else if (c == '0' && findNext(text, index, "x")) {
+        else if (c == '0' && findNext(text, code_index, "x")) {
             t.type = HEX;
 
             int i;
 
             for (i = 0; i < 2; i++) {
-                if (isxdigit(peek(text, index))) {
-                    t.value += consume(text, index);
+                if (isxdigit(peek(text, code_index))) {
+                    t.value += consume(text, code_index);
                 }
                 else {
                     throwException("Expected a hex digit", line);
                 }
             }
             
-            if (isxdigit(peek(text, index))) {
+            if (isxdigit(peek(text, code_index))) {
                 for (i = 0; i < 2; i++) {
-                    if (isxdigit(peek(text, index))) {
-                        t.value += consume(text, index);
+                    if (isxdigit(peek(text, code_index))) {
+                        t.value += consume(text, code_index);
                     }
                     else {
                         throwException("Expected a hex digit", line);
@@ -195,17 +195,17 @@ Token getNextToken(string* text, int* index, int line) {
         }
         else if (c == '_' || isalpha(c)) {
             if (c == 'm') {
-                if (isxdigit(peek(text, index))) {
-                    t.value += consume(text, index);
-                    if (isxdigit(peek(text, index))) {
-                        t.value += consume(text, index);
+                if (isxdigit(peek(text, code_index))) {
+                    t.value += consume(text, code_index);
+                    if (isxdigit(peek(text, code_index))) {
+                        t.value += consume(text, code_index);
                         t.type = MEMORY;
                     }
                 }
             }
             else if (c == 'r') {
-                if (isxdigit(peek(text, index))) {
-                    t.value += consume(text, index);
+                if (isxdigit(peek(text, code_index))) {
+                    t.value += consume(text, code_index);
                     t.type = REGISTER;
                 }
             }
@@ -213,11 +213,11 @@ Token getNextToken(string* text, int* index, int line) {
             if (t.type == UNKNOWN) {
                 t.type = LABEL;
                 
-                while (peek(text, index) == '_' || isalnum(peek(text, index))) {
-                    t.value += consume(text, index);
+                while (peek(text, code_index) == '_' || isalnum(peek(text, code_index))) {
+                    t.value += consume(text, code_index);
                 }
 
-                findNext(text, index, ":");
+                findNext(text, code_index, ":");
             }
         }
         else {
