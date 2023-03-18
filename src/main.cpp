@@ -10,19 +10,22 @@
 
 using namespace std;
 
-string readFile(string filepath) {
-    ifstream file(filepath);
+string outputMemory();
+string readFile(string filepath);
 
-    string content;
-    char ch;
+int main(int argc, char** argv) {
+    string input_file = argv[1];
+    string assembly_code = readFile(input_file);
+    parse(&assembly_code);
 
-    while (file.get(ch)) {
-        content += ch;
+    if (argc == 2) {
+        cout << outputMemory();
     }
-
-    file.close();
-
-    return content;
+    else {
+        ofstream file(argv[2]);
+        file << outputMemory();
+        file.close();
+    }
 }
 
 string outputMemory() {
@@ -45,17 +48,17 @@ string outputMemory() {
     return ss.str();
 }
 
-int main(int argc, char** argv) {
-    string input_file = argv[1];
-    string assembly_code = readFile(input_file);
-    parse(&assembly_code);
+string readFile(string filepath) {
+    ifstream file(filepath);
 
-    if (argc == 2) {
-        cout << outputMemory();
+    string content;
+    char ch;
+
+    while (file.get(ch)) {
+        content += ch;
     }
-    else {
-        ofstream file(argv[2]);
-        file << outputMemory();
-        file.close();
-    }
+
+    file.close();
+
+    return content;
 }
