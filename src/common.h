@@ -3,8 +3,6 @@
 
 #include <string>
 
-static std::string memory[256];
-
 std::string decimalToHex(int num);
 int hexToDecimal(std::string hex_str);
 

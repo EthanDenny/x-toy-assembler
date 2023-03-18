@@ -10,6 +10,7 @@
 
 using namespace std;
 
+string memory[256];
 int line;
 int code_index;
 int globalPtr = 0x10;
@@ -21,6 +22,10 @@ typedef struct label_hook {
 
 vector<LabelHook> hook_put;
 vector<LabelHook> hook_get;
+
+string* getMemory() {
+    return memory;
+}
 
 void writeMemory(string statement) {
     memory[globalPtr] = statement;

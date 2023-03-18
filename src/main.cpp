@@ -32,6 +32,7 @@ int main(int argc, char** argv) {
 }
 
 string outputMemory() {
+    string* memory = getMemory();
     stringstream ss;
 
     bool has_printed_const = false;
