@@ -13,7 +13,7 @@ using namespace std;
 string memory[256];
 int global_ptr = 0x10;
 int line;
-int code_index = 0;
+int code_index;
 
 typedef struct label_hook {
     string label;
@@ -23,7 +23,7 @@ typedef struct label_hook {
 vector<LabelHook> hook_put;
 vector<LabelHook> hook_get;
 
-void removeNextTokenIf(string* text, TokenType type);
+void skipNextTokenIf(string* text, TokenType type);
 
 string* getMemory(void) {
     return memory;
@@ -45,8 +45,8 @@ string tryGetToken(string* text, TokenType type) {
     Token t;
 
     if (type == TERMINATOR) {
-        removeNextTokenIf(text, WHITESPACE);
-        removeNextTokenIf(text, COMMENT);
+        skipNextTokenIf(text, WHITESPACE);
+        skipNextTokenIf(text, COMMENT);
 
         t = getNextToken(text, &code_index, line);
 
@@ -69,7 +69,7 @@ string tryGetToken(string* text, TokenType type) {
     return t.value;
 }
 
-void removeNextTokenIf(string* text, TokenType type) {
+void skipNextTokenIf(string* text, TokenType type) {
     if (isNextToken(text, type)) tryGetToken(text, type);
 }
 
@@ -171,6 +171,7 @@ void writeString(string addr, string str) {
 void parse(string* text) {
     Token t;
     line = 1;
+    code_index = 0;
 
     while (t.type != END) {
         t = getNextToken(text, &code_index, line);
@@ -196,7 +197,7 @@ void parse(string* text) {
             else if (isNextToken(text, CURLY_BRACE_LEFT)) {
                 tryGetToken(text, CURLY_BRACE_LEFT);
                 for (int ptr = hexToDecimal(mem); ptr < 256; ptr++) {
-                    removeNextTokenIf(text, WHITESPACE);
+                    skipNextTokenIf(text, WHITESPACE);
                     string hex = tryGetToken(text, HEX);
                     memory[ptr] = hex;
                     if (isNextToken(text, CURLY_BRACE_RIGHT)) {
