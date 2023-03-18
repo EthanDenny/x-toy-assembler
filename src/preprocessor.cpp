@@ -38,9 +38,8 @@ void preprocess(string* text) {
 
             code_index++;
 
-            C = peek(text, &code_index);
-            while (C == ' ' || C == '\t') {
-                C = consume(text, &code_index);
+            while (isWhitespace(peek(text, &code_index))) {
+                consume(text, &code_index);
             }
 
             stringstream replaceWith;
