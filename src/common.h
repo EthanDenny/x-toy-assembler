@@ -1,5 +1,5 @@
-#ifndef HELPERS
-#define HELPERS
+#ifndef COMMON
+#define COMMON
 
 #include <string>
 
