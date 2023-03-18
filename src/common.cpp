@@ -1,6 +1,8 @@
 #include <string>
 #include <sstream>
 
+#include "exception.h"
+
 using namespace std;
 
 string decimalToHex(int num) {
@@ -32,4 +34,40 @@ char consume(string* text, int* code_index) {
     char ch = peek(text, code_index);
     *code_index += 1;
     return ch;
+}
+
+string resolveEscapeSeqs(string original, int line) {
+    stringstream resolved;
+
+    for (size_t i = 0; i < original.length() - 1; i++) {
+        char ch = original[i];
+
+        if (ch == '\\') {
+            i++;
+            char ch2 = original[i];
+
+            if (ch2 == '\\') {
+                resolved << '\\';
+            }
+            else if (ch2 == '0') {
+                resolved << '\0';
+            }
+            else if (ch2 == 't') {
+                resolved << '\t';
+            }
+            else if (ch2 == 'n') {
+                resolved << '\n';
+            }
+            else {
+                string s;
+                s += ch2;
+                throwException("Unknown escape sequence '\\" + s + "' ", line);
+            }
+        }
+        else {
+            resolved << ch;
+        }
+    }
+
+    return resolved.str();
 }

@@ -126,26 +126,17 @@ Token getNextToken(string* text, int* code_index, int line) {
             t.type = STRING;
 
             char C;
-            bool escape = false;
-
             while (C != '"') {
-                C = consume(text, code_index);
-
                 if (C == '\n' || C == EOF) {
                     throwException("Expected closing quotes", line);
                 }
 
-                if (escape) {
-                    if (C == 'n') {
-                        t.value += '\n';
-                    }
-                }
-                else if (C != '"') {
-                    t.value += C;
-                }
+                t.value += C;
 
-                escape = C == '\\';
+                C = consume(text, code_index);
             }
+
+            t.value = resolveEscapeSeqs(t.value, line);
         }
         else if (c == '#') {
             if (!isdigit(peek(text, code_index))) {
