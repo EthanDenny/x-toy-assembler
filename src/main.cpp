@@ -4,7 +4,7 @@
 
 #include "lexer.h"
 #include "parser.h"
-#include "types.h"
+#include "token.h"
 #include "common.h"
 
 using namespace std;

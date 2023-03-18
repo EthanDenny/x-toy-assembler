@@ -5,7 +5,7 @@
 
 #include "exception.h"
 #include "lexer.h"
-#include "types.h"
+#include "token.h"
 #include "common.h"
 
 using namespace std;
@@ -23,7 +23,7 @@ typedef struct label_hook {
 vector<LabelHook> hook_put;
 vector<LabelHook> hook_get;
 
-void removeIf(string* text, token_type type);
+void removeIf(string* text, TokenType type);
 
 string* getMemory(void) {
     return memory;
@@ -34,14 +34,14 @@ void writeMemory(string statement) {
     global_ptr++;
 }
 
-bool isNextToken(string* text, token_type type) {
+bool isNextToken(string* text, TokenType type) {
     int old_index = code_index;
     Token t = grabToken(text, &code_index, line);
     code_index = old_index;
     return t.type == type;
 }
 
-string tryGrabToken(string* text, token_type type) {
+string tryGrabToken(string* text, TokenType type) {
     Token t;
 
     if (type == TERMINATOR) {
@@ -62,14 +62,14 @@ string tryGrabToken(string* text, token_type type) {
         t = grabToken(text, &code_index, line);
 
         if (t.type != type) {
-            throwException("Expected " + TokenTypeDescriptorsFull[type] + " got " + TokenTypeDescriptorsFull[t.type], line);
+            throwException("Expected " + TokenTypeDescriptors[type] + " got " + TokenTypeDescriptors[t.type], line);
         }
     }
 
     return t.value;
 }
 
-void removeIf(string* text, token_type type) {
+void removeIf(string* text, TokenType type) {
     if (isNextToken(text, type)) tryGrabToken(text, type);
 }
 

@@ -2,7 +2,7 @@
 #define LEXER
 
 #include <string>
-#include "types.h"
+#include "token.h"
 
 Token grabToken(std::string* text, int* index, int line);
 

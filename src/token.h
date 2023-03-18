@@ -1,9 +1,9 @@
-#ifndef TYPES
-#define TYPES
+#ifndef TOKEN
+#define TOKEN
 
 #include <string>
 
-enum token_type {
+typedef enum token_type {
     DATA,
     DEFINE,
     COMMENT,
@@ -47,57 +47,9 @@ enum token_type {
     UNKNOWN,
 
     TERMINATOR
-};
+} TokenType;
 
-static std::string TokenTypeDescriptors[] =
-{
-    "DATA",
-    "DEFINE",
-    "// COMMENT",
-    "LABEL",
-
-    "REGISTER",
-    "MEMORY",
-    "IMMEDIATE",
-    "HEX",
-    "STRING",
-
-    "ADD",
-    "SUB",
-    "AND",
-    "XOR",
-    "LSL",
-    "LSR",
-
-    "MOV",
-    "LDR",
-    "STR",
-
-    "BRANCH",
-    "BRANCH_ZERO",
-    "BRANCH_POSITIVE",
-    "BRANCH_REGISTER",
-    "BRANCH_LINK",
-
-    "STDIN",
-    "STDOUT",
-
-    "NEWLINE",
-    ";",
-    ",",
-    "{",
-    "}",
-    "_",
-
-    "END",
-
-    "UNKNOWN",
-
-    "TERMINATOR (SPECIAL)"
-};
-
-static std::string TokenTypeDescriptorsFull[] =
-{
+static std::string TokenTypeDescriptors[] = {
     "DATA",
     "DEFINE",
     "COMMENT",
@@ -116,9 +68,7 @@ static std::string TokenTypeDescriptorsFull[] =
     "LSL",
     "LSR",
 
-    "MOV",
-    "LDR",
-    "STR",
+    "MOV", "LDR", "STR",
 
     "BRANCH",
     "BRANCH_ZERO",
@@ -144,13 +94,8 @@ static std::string TokenTypeDescriptorsFull[] =
 };
 
 typedef struct token {
-    token_type type = UNKNOWN;
+    TokenType type = UNKNOWN;
     std::string value;
 } Token;
-
-typedef struct statement {
-    token_type type;
-    Token operands[3];
-} Statement;
 
 #endif

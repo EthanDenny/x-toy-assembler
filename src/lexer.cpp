@@ -1,7 +1,7 @@
 #include <string>
 
 #include "exception.h"
-#include "types.h"
+#include "token.h"
 
 using namespace std;
 
