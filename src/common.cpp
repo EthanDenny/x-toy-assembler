@@ -1,5 +1,6 @@
 #include <string>
 #include <sstream>
+#include <iostream>
 
 #include "exception.h"
 
@@ -39,7 +40,8 @@ char consume(string* text, int* code_index) {
 string resolveEscapeSeqs(string original, int line) {
     stringstream resolved;
 
-    for (size_t i = 0; i < original.length() - 1; i++) {
+    size_t i = 0;
+    for (; i < original.length() - 1; i++) {
         char ch = original[i];
 
         if (ch == '\\') {
@@ -67,6 +69,10 @@ string resolveEscapeSeqs(string original, int line) {
         else {
             resolved << ch;
         }
+    }
+
+    if (i < original.length()) {
+        resolved << original[i];
     }
 
     return resolved.str();

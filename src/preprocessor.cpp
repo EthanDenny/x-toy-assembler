@@ -54,7 +54,7 @@ void preprocess(string* text) {
             code_index = start_index;
 
             string findString = findThis.str();
-            string replaceString = replaceWith.str();
+            string replaceString = resolveEscapeSeqs(replaceWith.str(), line);
 
             size_t pos = 0;
             while (true) {
