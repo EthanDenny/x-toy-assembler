@@ -39,11 +39,6 @@ string outputMemory() {
                 has_printed_const = true;
             }
             ss << decimalToHex(i) << ": " << memory[i] << endl;
-
-             // Add halt
-            if (i >= 0x10 && memory[i + 1] == "") {
-                ss << decimalToHex(i + 1) << ": 0000" << endl;
-            }
         }
     }
 

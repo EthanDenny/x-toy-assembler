@@ -366,4 +366,6 @@ void parse(string* text) {
             // Throw an error: Unexpected token
         }
     }
+
+    writeMemory("0000");
 }
