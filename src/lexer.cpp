@@ -53,6 +53,9 @@ Token getNextToken(string* text, int* index, int line) {
     else if (findToken(text, index, ".define")) {
         t.type = DEFINE;
     }
+    else if (findToken(text, index, "halt")) {
+        t.type = HALT;
+    }
     else if (findToken(text, index, "\n")) {
         t.type = NEWLINE;
     }

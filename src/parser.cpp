@@ -234,6 +234,9 @@ void parse(string* text) {
 
             hook_get.push_back(hook);
         }
+        else if (t.type == HALT) {
+            writeMemory("0000");
+        }
         else if (t.type == ADD) {
             ALStatement(text, "1");
         }

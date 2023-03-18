@@ -8,6 +8,7 @@ typedef enum token_type {
     DEFINE,
     COMMENT,
     LABEL,
+    HALT,
 
     REGISTER,
     MEMORY,
@@ -46,7 +47,8 @@ typedef enum token_type {
 
     UNKNOWN,
 
-    TERMINATOR
+    TERMINATOR,
+
 } TokenType;
 
 static std::string TokenTypeDescriptors[] = {
@@ -54,6 +56,7 @@ static std::string TokenTypeDescriptors[] = {
     "DEFINE",
     "COMMENT",
     "LABEL",
+    "HALT",
 
     "REGISTER",
     "MEMORY",
