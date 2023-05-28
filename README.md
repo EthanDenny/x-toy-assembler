@@ -1,4 +1,4 @@
-# toy-assembler
+# x-toy-assembler
 
 An assembler for the [X-TOY machine from Princeton](https://lift.cs.princeton.edu/xtoy/) in C++.
 
