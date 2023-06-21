@@ -9,3 +9,9 @@ The TOY machine uses *.toy as its file extension. This assembler take in *.atoy 
 Princeton's implementation is written in Java and doesn't work with a terminal. Try [this](https://github.com/EthanDenny/python-x-toy) instead.
 
 Documentation for X-TOY machine code can be found [here](https://introcs.cs.princeton.edu/java/62toy/cheatsheet.txt).
+
+## Using the assembler
+
+1. Compile with "make"
+2. Run with "./build/main.exe \[input file\] \[output file\]"
+3. Input files should have the extension "\*.atoy", output files should have the extension "\*.toy"
