@@ -187,7 +187,7 @@ Store the PC in the given register and then goto the given label.
 
 Set the value of the given register to stdin.
 
-## stdin \<reg>
+## stdout \<reg>
 
 Write the value of the given register to stdout.
 
