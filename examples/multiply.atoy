@@ -1,0 +1,14 @@
+main:
+    mov r1, #3
+    mov r2, #4
+    bl rF, multiply
+    stdout r1
+
+multiply:
+    mov r3, #1
+multiply_loop:
+    sub r2, r3
+    bz r2, multiply_return
+    add r1, r1
+multiply_return:
+    br rF
