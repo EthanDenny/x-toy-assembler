@@ -42,3 +42,6 @@
 
 # WIP folder
 /wip
+
+# Compiled TOY files
+*.toy
