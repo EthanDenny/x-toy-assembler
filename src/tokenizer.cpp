@@ -125,7 +125,7 @@ Token getNextToken(string* text, int* code_index, int line) {
         else if (c == '"') {
             t.type = STRING;
 
-            char C;
+            char C = consume(text, code_index);
             while (C != '"') {
                 if (C == '\n' || C == EOF) {
                     throwException("Expected closing quotes", line);
