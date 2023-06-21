@@ -339,17 +339,7 @@ void parse(string* text) {
             writeSingleRegStatement(text, "E", "00");
         }
         else if (t.type == BRANCH_LINK) {
-            string reg;
-            string mem;
-
-            tryGetToken(text, WHITESPACE);
-            reg = tryGetToken(text, REGISTER);
-            tryGetToken(text, COMMA);
-            tryGetToken(text, WHITESPACE);
-            mem = tryGetToken(text, MEMORY);
-            tryGetToken(text, TERMINATOR);
-
-            writeMemory("F" + reg + mem);
+            writeBranchRegStatement(text, "F");
         }
         else if (t.type == STDIN) {
             writeSingleRegStatement(text, "8", "FF");

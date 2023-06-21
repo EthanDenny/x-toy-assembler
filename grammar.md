@@ -173,9 +173,9 @@ If the value in the given register is greater than 0, goto the given label.
 
 Jump to the address stored in the given register.
 
-## bl \<reg>, \<addr>
+## bl \<reg>, \<label>
 
-Store the PC in the given register and then jump to 'addr'.
+Store the PC in the given register and then goto the given label.
 
 *Syntax*
 
@@ -218,7 +218,7 @@ Write the value of the given register to stdout.
 - bz -> Cr## (## = resolved label)
 - bp -> Dr## (## = resolved label)
 - br -> Er00
-- bl -> Fr## (## = addr)
+- bl -> Fr## (## = resolved label)
 
 ## I/O
 
