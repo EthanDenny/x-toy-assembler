@@ -11,7 +11,7 @@ using namespace std;
 
 void preprocess(string* text) {
     Token t;
-    int line = 0;
+    int line = 1;
     int code_index = 0;
 
     while (t.type != END) {
@@ -50,7 +50,7 @@ void preprocess(string* text) {
                 C = consume(text, &code_index);
             }
             
-            text->erase(start_index, code_index - start_index);
+            text->erase(start_index, code_index - start_index - 1);
             code_index = start_index;
 
             string findString = findThis.str();
